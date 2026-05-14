@@ -396,12 +396,7 @@ overdue_amt = (
     if not outflows.empty
     else 0.0
 )
-already_in_amt = (
-    float(inflows.loc[inflows["value_date"] <= today, "amount_usd"].sum())
-    if not inflows.empty
-    else 0.0
-)
-cash_now = ss.current_bank + already_in_amt - overdue_amt
+cash_now = ss.current_bank - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
 c1, c2, c3, c4 = st.columns(4)
@@ -418,8 +413,8 @@ c4.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 if overdue_amt > 0 and cash_now < 0:
     st.error(
         f"⚠️ Outstanding payments due by today (${overdue_amt:,.0f}) exceed your current "
-        f"bank + received payments (${ss.current_bank + already_in_amt:,.0f}) by "
-        f"${-cash_now:,.0f}. You're cash-negative right now."
+        f"bank balance (${ss.current_bank:,.0f}) by ${-cash_now:,.0f}. "
+        f"You're cash-negative right now (before counting any incoming receivables)."
     )
 
 # Today's recommendation hero card — shows actual balance even when negative
