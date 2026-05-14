@@ -1,4 +1,4 @@
-"""Month-grid calendar rendering for Streamlit."""
+"""Month-grid calendar rendering for Streamlit, mobile-friendly via CSS @media."""
 
 from __future__ import annotations
 
@@ -9,6 +9,60 @@ import pandas as pd
 import streamlit as st
 
 from calc import max_buy
+
+_CSS = """
+<style>
+.cf-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+}
+.cf-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+.cf-weekday {
+    text-align: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: #666;
+    padding: 4px;
+}
+.cf-cell {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e6e6e6;
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+.cf-cell.past { color: #bbb; background: #fafafa; }
+.cf-cell.today { border: 2px solid #1a73e8; background: #fffde7; }
+.cf-day { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.cf-weekday-inline { display: none; opacity: 0.6; font-weight: 400; font-size: 12px; margin-left: 6px; }
+.cf-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    line-height: 1.5;
+}
+.cf-row .lbl { opacity: 0.75; }
+.cf-row .val { font-weight: 600; white-space: nowrap; }
+.cf-positive { color: #0d652d; }
+.cf-negative { color: #b71c1c; }
+@media (max-width: 720px) {
+    .cf-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    .cf-header { display: none !important; }
+    .cf-cell.past { display: none !important; }
+    .cf-cell { padding: 12px !important; }
+    .cf-day { font-size: 18px !important; margin-bottom: 8px !important; }
+    .cf-row { font-size: 14px !important; line-height: 1.7 !important; }
+    .cf-weekday-inline { display: inline !important; }
+}
+</style>
+"""
 
 
 def _fmt_money(x: float) -> str:
@@ -23,6 +77,7 @@ def _cell_html(
     d: date,
     is_today: bool,
     in_past: bool,
+    weekday: str,
     terms: list[int],
     current_bank: float,
     inflows: pd.DataFrame,
@@ -30,35 +85,26 @@ def _cell_html(
     safety_buffer: float,
 ) -> str:
     if in_past:
-        return (
-            f"<div style='padding:8px;border-radius:6px;background:#fafafa;color:#bbb;"
-            f"font-size:12px;height:120px;'>"
-            f"<div style='font-weight:600'>{d.day}</div>"
-            f"<div style='opacity:0.5'>past</div></div>"
-        )
+        return f"<div class='cf-cell past'><div class='cf-day'>{d.day}</div><div style='opacity:0.5;font-size:11px'>past</div></div>"
 
-    border = "2px solid #1a73e8" if is_today else "1px solid #e6e6e6"
-    bg = "#fffde7" if is_today else "white"
+    klass = "cf-cell today" if is_today else "cf-cell"
     badge = " 📍" if is_today else ""
-
     rows = []
     for t in terms:
         val = max_buy(d, t, current_bank, inflows, outflows, safety_buffer)
         label = "Cash" if t == 0 else f"{t}d"
         if val > 0:
-            color = "#0d652d"
+            color_class = "cf-positive"
             txt = _fmt_money(val)
         else:
-            color = "#b71c1c"
+            color_class = "cf-negative"
             txt = "—"
         rows.append(
-            f"<div style='display:flex;justify-content:space-between;font-size:11px;color:{color};line-height:1.4'>"
-            f"<span style='opacity:0.75'>{label}</span><span style='font-weight:600'>{txt}</span></div>"
+            f"<div class='cf-row {color_class}'><span class='lbl'>{label}</span><span class='val'>{txt}</span></div>"
         )
-
     return (
-        f"<div style='padding:8px;border-radius:6px;border:{border};background:{bg};height:140px;overflow:hidden'>"
-        f"<div style='font-weight:700;font-size:14px;margin-bottom:4px'>{d.day}{badge}</div>"
+        f"<div class='{klass}'>"
+        f"<div class='cf-day'>{d.day}{badge}<span class='cf-weekday-inline'>{weekday}</span></div>"
         f"{''.join(rows)}"
         f"</div>"
     )
@@ -78,22 +124,23 @@ def render_month(
     today = date.today()
     weekday_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-    header_html = "".join(
-        f"<div style='text-align:center;font-weight:600;font-size:12px;color:#666;padding:4px'>{w}</div>"
-        for w in weekday_names
-    )
-    grid_cells = []
+    header_html = "<div class='cf-header'>" + "".join(
+        f"<div class='cf-weekday'>{w}</div>" for w in weekday_names
+    ) + "</div>"
+
+    cells = []
     for week in weeks:
-        for day in week:
+        for i, day in enumerate(week):
             if day == 0:
-                grid_cells.append("<div></div>")
+                cells.append("<div></div>")
                 continue
             d = date(year, month, day)
-            grid_cells.append(
+            cells.append(
                 _cell_html(
                     d,
                     d == today,
                     d < today,
+                    weekday_names[i],
                     terms_days,
                     current_bank,
                     inflows,
@@ -101,15 +148,8 @@ def render_month(
                     safety_buffer,
                 )
             )
-    st.markdown(
-        "<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:6px'>"
-        + header_html
-        + "</div>"
-        + "<div style='display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px'>"
-        + "".join(grid_cells)
-        + "</div>",
-        unsafe_allow_html=True,
-    )
+    grid_html = "<div class='cf-grid'>" + "".join(cells) + "</div>"
+    st.markdown(header_html + grid_html, unsafe_allow_html=True)
 
 
 def render_range(
@@ -121,6 +161,7 @@ def render_range(
     terms_days: list[int],
     safety_buffer: float,
 ) -> None:
+    st.markdown(_CSS, unsafe_allow_html=True)
     cur = date(start.year, start.month, 1)
     while cur <= end:
         st.markdown(f"#### {cur.strftime('%B %Y')}")
