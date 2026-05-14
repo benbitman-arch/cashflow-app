@@ -78,6 +78,7 @@ ss.setdefault("terms_days_str", "0,30,45,60,75")
 ss.setdefault("weekly_sales", 0.0)
 ss.setdefault("customer_terms_days", 30)
 ss.setdefault("snapshot_saved_at", None)
+ss.setdefault("last_saved_settings", None)
 
 GH_TOKEN = st.secrets.get("github_token", "")
 GH_REPO = st.secrets.get("github_repo", GH_REPO_DEFAULT)
@@ -97,6 +98,14 @@ if not ss.loaded:
         if parsed.get("customer_terms_days") is not None:
             ss.customer_terms_days = int(parsed["customer_terms_days"])
         ss.snapshot_saved_at = parsed.get("saved_at")
+    # Mark the just-loaded settings as the baseline so we don't immediately re-save.
+    ss.last_saved_settings = (
+        ss.current_bank,
+        ss.safety_buffer,
+        ss.terms_days_str,
+        ss.weekly_sales,
+        ss.customer_terms_days,
+    )
     ss.loaded = True
 
 
@@ -208,31 +217,26 @@ with st.sidebar:
         st.error("Terms must be integers separated by commas, e.g. 0,30,45,60,75")
         terms_days = [0, 30, 45, 60, 75]
 
-    settings_changed = (
-        new_bank != ss.current_bank
-        or new_buffer != ss.safety_buffer
-        or new_terms != ss.terms_days_str
-        or new_weekly_sales != ss.weekly_sales
-        or new_cust_terms != ss.customer_terms_days
+    # Apply input values to session state every rerun (cheap; calendar reflects live values).
+    ss.current_bank = float(new_bank)
+    ss.safety_buffer = float(new_buffer)
+    ss.terms_days_str = new_terms
+    ss.weekly_sales = float(new_weekly_sales)
+    ss.customer_terms_days = int(new_cust_terms)
+
+    # Auto-save to cloud whenever a setting changed compared to the last persisted state.
+    current_settings = (
+        ss.current_bank,
+        ss.safety_buffer,
+        ss.terms_days_str,
+        ss.weekly_sales,
+        ss.customer_terms_days,
     )
-    if st.button(
-        "💾 Save settings to cloud",
-        use_container_width=True,
-        disabled=not settings_changed,
-    ):
-        ss.current_bank = float(new_bank)
-        ss.safety_buffer = float(new_buffer)
-        ss.terms_days_str = new_terms
-        ss.weekly_sales = float(new_weekly_sales)
-        ss.customer_terms_days = int(new_cust_terms)
-        _push_snapshot("settings change")
+    if ss.last_saved_settings != current_settings:
+        ss.last_saved_settings = current_settings
+        _push_snapshot("settings auto-save")
     else:
-        # apply in-session even without save, so calendar reflects current inputs
-        ss.current_bank = float(new_bank)
-        ss.safety_buffer = float(new_buffer)
-        ss.terms_days_str = new_terms
-        ss.weekly_sales = float(new_weekly_sales)
-        ss.customer_terms_days = int(new_cust_terms)
+        st.caption("☁️ Settings auto-save to cloud when you change them")
 
     today = date.today()
     horizon = st.slider("Calendar horizon (days)", 30, 180, 90, step=30)
