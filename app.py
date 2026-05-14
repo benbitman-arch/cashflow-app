@@ -11,7 +11,13 @@ import exclude_list
 from calc import daily_balance_series, projected_balance
 from calendar_view import render_range
 from parsers import parse_checks, parse_omd_debt, parse_suppliers_debt
-from persistence import load_snapshot, save_snapshot
+from persistence import (
+    GH_REPO_DEFAULT,
+    build_snapshot,
+    load_from_github,
+    parse_snapshot,
+    save_to_github,
+)
 
 st.set_page_config(page_title="Cash Flow Calendar", layout="wide")
 
@@ -39,28 +45,65 @@ if not _check_password():
     st.stop()
 
 
-# ---------- session state ----------
+# ---------- session state + cloud load ----------
 ss = st.session_state
-ss.setdefault("payments_out", pd.DataFrame())
+ss.setdefault("payments_out_by_source", {})  # {"checks": df, "suppliers_debt": df}
 ss.setdefault("payments_in", pd.DataFrame())
 ss.setdefault("excluded_omd", pd.DataFrame())
-ss.setdefault("loaded_from_snapshot", False)
-
-if not ss.loaded_from_snapshot:
-    snap = load_snapshot()
-    if snap:
-        ss.payments_out = snap["payments_out"]
-        ss.payments_in = snap["payments_in"]
-        ss.current_bank = snap["current_bank"]
-        ss.safety_buffer = snap["safety_buffer"]
-        ss.terms_days_str = ",".join(str(t) for t in snap["terms_days"])
-        ss.snapshot_saved_at = snap.get("saved_at")
-    ss.loaded_from_snapshot = True
-
+ss.setdefault("loaded", False)
 ss.setdefault("current_bank", 0.0)
 ss.setdefault("safety_buffer", 0.0)
 ss.setdefault("terms_days_str", "0,30,45,60,75")
 ss.setdefault("snapshot_saved_at", None)
+
+GH_TOKEN = st.secrets.get("github_token", "")
+GH_REPO = st.secrets.get("github_repo", GH_REPO_DEFAULT)
+
+if not ss.loaded:
+    snap = load_from_github(repo=GH_REPO, token=GH_TOKEN or None)
+    if snap:
+        parsed = parse_snapshot(snap)
+        ss.payments_out_by_source = parsed["payments_out_by_source"]
+        ss.payments_in = parsed["payments_in"]
+        ss.excluded_omd = parsed["excluded_omd"]
+        ss.current_bank = parsed["current_bank"]
+        ss.safety_buffer = parsed["safety_buffer"]
+        ss.terms_days_str = ",".join(str(t) for t in parsed["terms_days"])
+        ss.snapshot_saved_at = parsed.get("saved_at")
+    ss.loaded = True
+
+
+def _outflows() -> pd.DataFrame:
+    parts = [df for df in ss.payments_out_by_source.values() if df is not None and not df.empty]
+    return pd.concat(parts, ignore_index=True) if parts else pd.DataFrame()
+
+
+def _push_snapshot(reason: str) -> None:
+    if not GH_TOKEN:
+        st.warning(
+            "Snapshot not pushed: `github_token` is not set in Streamlit secrets. "
+            "Data persists only for this session."
+        )
+        return
+    try:
+        terms_days = [int(x.strip()) for x in ss.terms_days_str.split(",") if x.strip()]
+    except ValueError:
+        terms_days = [0, 30, 45, 60, 75]
+    snap = build_snapshot(
+        payments_out_by_source=ss.payments_out_by_source,
+        payments_in=ss.payments_in,
+        excluded_omd=ss.excluded_omd,
+        current_bank=ss.current_bank,
+        safety_buffer=ss.safety_buffer,
+        terms_days=terms_days,
+    )
+    ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
+    if ok:
+        ss.snapshot_saved_at = snap["saved_at"]
+        st.success(f"☁️ Snapshot saved to cloud ({reason})")
+    else:
+        st.error(f"Cloud save failed: {msg}")
+
 
 # ---------- sidebar ----------
 with st.sidebar:
@@ -70,20 +113,18 @@ with st.sidebar:
     f_omd = st.file_uploader("OMD Debt (customers)", type=["xls", "xlsx"], key="f_omd")
 
     if st.button("Parse uploads", use_container_width=True, type="primary"):
-        outflows = []
-        excluded_omd = pd.DataFrame()
+        touched_anything = False
         try:
             if f_checks:
                 r = parse_checks(f_checks)
-                outflows.append(r.payments)
+                ss.payments_out_by_source["checks"] = r.payments
                 st.success(f"Checks: {len(r.payments)} payments")
+                touched_anything = True
             if f_sdebt:
                 r = parse_suppliers_debt(f_sdebt)
-                outflows.append(r.payments)
+                ss.payments_out_by_source["suppliers_debt"] = r.payments
                 st.success(f"Suppliers debt: {len(r.payments)} payments")
-            if outflows:
-                # unify date column to due_date
-                ss.payments_out = pd.concat(outflows, ignore_index=True)
+                touched_anything = True
             if f_omd:
                 r = parse_omd_debt(f_omd)
                 ss.payments_in = r.payments
@@ -91,37 +132,56 @@ with st.sidebar:
                 st.success(
                     f"OMD: {len(r.payments)} receivables, {len(r.excluded)} excluded"
                 )
+                touched_anything = True
+            if touched_anything:
+                _push_snapshot("after upload")
+            else:
+                st.info("No new files selected.")
         except Exception as e:
             st.error(f"Parse failed: {e}")
 
     st.divider()
     st.header("Settings")
-    ss.current_bank = st.number_input(
+    new_bank = st.number_input(
         "Current bank balance (USD)", value=float(ss.current_bank), step=1000.0, format="%.2f"
     )
-    ss.safety_buffer = st.number_input(
+    new_buffer = st.number_input(
         "Safety buffer (USD)", value=float(ss.safety_buffer), step=1000.0, format="%.2f"
     )
-    ss.terms_days_str = st.text_input("Terms (days, comma-separated)", value=ss.terms_days_str)
+    new_terms = st.text_input("Terms (days, comma-separated)", value=ss.terms_days_str)
     try:
-        terms_days = [int(x.strip()) for x in ss.terms_days_str.split(",") if x.strip()]
+        terms_days = [int(x.strip()) for x in new_terms.split(",") if x.strip()]
     except ValueError:
         st.error("Terms must be integers separated by commas, e.g. 0,30,45,60,75")
         terms_days = [0, 30, 45, 60, 75]
+
+    settings_changed = (
+        new_bank != ss.current_bank
+        or new_buffer != ss.safety_buffer
+        or new_terms != ss.terms_days_str
+    )
+    if st.button(
+        "💾 Save settings to cloud",
+        use_container_width=True,
+        disabled=not settings_changed,
+    ):
+        ss.current_bank = float(new_bank)
+        ss.safety_buffer = float(new_buffer)
+        ss.terms_days_str = new_terms
+        _push_snapshot("settings change")
+    else:
+        # apply in-session even without save, so calendar reflects current inputs
+        ss.current_bank = float(new_bank)
+        ss.safety_buffer = float(new_buffer)
+        ss.terms_days_str = new_terms
 
     today = date.today()
     horizon = st.slider("Calendar horizon (days)", 30, 180, 90, step=30)
     start_date = today
     end_date = today + timedelta(days=horizon)
 
-    st.divider()
-    if st.button("💾 Save snapshot", use_container_width=True):
-        save_snapshot(
-            ss.payments_out, ss.payments_in, ss.current_bank, ss.safety_buffer, terms_days
-        )
-        st.success("Saved.")
     if ss.snapshot_saved_at:
-        st.caption(f"Last saved: {ss.snapshot_saved_at}")
+        st.caption(f"☁️ Last cloud snapshot: {ss.snapshot_saved_at}")
 
     st.divider()
     st.header("Exclude list")
@@ -139,7 +199,7 @@ with st.sidebar:
 st.title("💰 Cash Flow Calendar")
 
 inflows = ss.payments_in
-outflows = ss.payments_out
+outflows = _outflows()
 
 if outflows.empty and inflows.empty:
     st.info("Upload your 3 Excel files in the sidebar and click **Parse uploads** to start.")

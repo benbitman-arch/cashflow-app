@@ -1,77 +1,147 @@
-"""Persist the latest parsed snapshot to a local SQLite DB.
+"""Snapshot persistence.
 
-For Streamlit Cloud, this DB lives in the working directory. To survive
-redeploys, commit `cashflow.db` to the repo after each save (or replace this
-module with a Postgres backend).
+Reads from a JSON file in the GitHub repo (so the same data is shared across
+all visitors), and writes back via the GitHub Contents API. The token only
+needs `Contents: read-write` on this single repo.
 """
 
 from __future__ import annotations
 
-import sqlite3
-from datetime import date
-from pathlib import Path
+import base64
+import json
+from datetime import date, datetime
+from typing import Any
 
 import pandas as pd
+import requests
 
-DB_PATH = Path(__file__).parent / "cashflow.db"
-
-
-def _conn() -> sqlite3.Connection:
-    c = sqlite3.connect(DB_PATH)
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIMARY KEY, value TEXT
-        )"""
-    )
-    return c
+GH_REPO_DEFAULT = "benbitman-arch/cashflow-app"
+GH_FILE_PATH = "data/snapshot.json"
+GH_BRANCH = "main"
+RAW_URL = f"https://raw.githubusercontent.com/{{repo}}/{GH_BRANCH}/{GH_FILE_PATH}"
+API_URL = f"https://api.github.com/repos/{{repo}}/contents/{GH_FILE_PATH}"
 
 
-def save_snapshot(
-    payments_out: pd.DataFrame,
+def _serialize_df(df: pd.DataFrame) -> list[dict]:
+    if df is None or df.empty:
+        return []
+    records = []
+    for _, row in df.iterrows():
+        rec = {}
+        for col, val in row.items():
+            if isinstance(val, (date, datetime)):
+                rec[col] = val.isoformat()
+            elif val is None:
+                rec[col] = None
+            else:
+                try:
+                    if pd.isna(val):
+                        rec[col] = None
+                        continue
+                except (TypeError, ValueError):
+                    pass
+                rec[col] = val
+        records.append(rec)
+    return records
+
+
+def _deserialize_df(records: list[dict], date_cols: list[str]) -> pd.DataFrame:
+    if not records:
+        return pd.DataFrame()
+    df = pd.DataFrame(records)
+    for col in date_cols:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce").dt.date
+    return df
+
+
+def build_snapshot(
+    payments_out_by_source: dict[str, pd.DataFrame],
     payments_in: pd.DataFrame,
+    excluded_omd: pd.DataFrame,
     current_bank: float,
     safety_buffer: float,
     terms_days: list[int],
-) -> None:
-    with _conn() as c:
-        payments_out_s = payments_out.copy()
-        payments_in_s = payments_in.copy()
-        if "due_date" in payments_out_s:
-            payments_out_s["due_date"] = payments_out_s["due_date"].astype(str)
-        if "value_date" in payments_in_s:
-            payments_in_s["value_date"] = payments_in_s["value_date"].astype(str)
-        payments_out_s.to_sql("payments_out", c, if_exists="replace", index=False)
-        payments_in_s.to_sql("payments_in", c, if_exists="replace", index=False)
-        c.executemany(
-            "INSERT OR REPLACE INTO settings(key, value) VALUES (?, ?)",
-            [
-                ("current_bank", str(current_bank)),
-                ("safety_buffer", str(safety_buffer)),
-                ("terms_days", ",".join(str(t) for t in terms_days)),
-                ("saved_at", date.today().isoformat()),
-            ],
-        )
-
-
-def load_snapshot() -> dict | None:
-    if not DB_PATH.exists():
-        return None
-    with _conn() as c:
-        try:
-            payments_out = pd.read_sql("SELECT * FROM payments_out", c)
-            payments_in = pd.read_sql("SELECT * FROM payments_in", c)
-        except Exception:
-            return None
-        if "due_date" in payments_out:
-            payments_out["due_date"] = pd.to_datetime(payments_out["due_date"]).dt.date
-        if "value_date" in payments_in:
-            payments_in["value_date"] = pd.to_datetime(payments_in["value_date"]).dt.date
-        settings = dict(c.execute("SELECT key, value FROM settings").fetchall())
+) -> dict[str, Any]:
     return {
-        "payments_out": payments_out,
-        "payments_in": payments_in,
-        "current_bank": float(settings.get("current_bank", 0) or 0),
-        "safety_buffer": float(settings.get("safety_buffer", 0) or 0),
-        "terms_days": [int(x) for x in settings.get("terms_days", "0,30,45,60,75").split(",") if x],
-        "saved_at": settings.get("saved_at"),
+        "version": 1,
+        "saved_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "payments_out_by_source": {
+            src: _serialize_df(df) for src, df in payments_out_by_source.items()
+        },
+        "payments_in": _serialize_df(payments_in),
+        "excluded_omd": _serialize_df(excluded_omd),
+        "current_bank": float(current_bank),
+        "safety_buffer": float(safety_buffer),
+        "terms_days": list(terms_days),
     }
+
+
+def parse_snapshot(snap: dict[str, Any]) -> dict[str, Any]:
+    payments_out_by_source = {
+        src: _deserialize_df(recs, ["due_date"])
+        for src, recs in (snap.get("payments_out_by_source") or {}).items()
+    }
+    return {
+        "payments_out_by_source": payments_out_by_source,
+        "payments_in": _deserialize_df(snap.get("payments_in") or [], ["value_date"]),
+        "excluded_omd": _deserialize_df(snap.get("excluded_omd") or [], ["value_date"]),
+        "current_bank": float(snap.get("current_bank") or 0),
+        "safety_buffer": float(snap.get("safety_buffer") or 0),
+        "terms_days": list(snap.get("terms_days") or [0, 30, 45, 60, 75]),
+        "saved_at": snap.get("saved_at"),
+    }
+
+
+def load_from_github(repo: str = GH_REPO_DEFAULT, token: str | None = None) -> dict | None:
+    """Read the snapshot from GitHub. Uses the raw CDN (no auth needed for public repos)."""
+    url = RAW_URL.format(repo=repo)
+    headers = {"Cache-Control": "no-cache"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            return r.json()
+    except Exception:
+        return None
+    return None
+
+
+def save_to_github(
+    snapshot: dict, token: str, repo: str = GH_REPO_DEFAULT
+) -> tuple[bool, str]:
+    """Push the snapshot JSON to GitHub via the Contents API. Returns (ok, message)."""
+    url = API_URL.format(repo=repo)
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    # Fetch current SHA if file already exists
+    sha = None
+    try:
+        r = requests.get(url, headers=headers, params={"ref": GH_BRANCH}, timeout=10)
+        if r.status_code == 200:
+            sha = r.json().get("sha")
+    except Exception as e:
+        return False, f"GitHub GET failed: {e}"
+
+    payload_text = json.dumps(snapshot, ensure_ascii=False, indent=2)
+    content_b64 = base64.b64encode(payload_text.encode("utf-8")).decode("ascii")
+    body = {
+        "message": f"snapshot: update {snapshot.get('saved_at', '')}",
+        "content": content_b64,
+        "branch": GH_BRANCH,
+    }
+    if sha:
+        body["sha"] = sha
+
+    try:
+        r = requests.put(url, headers=headers, json=body, timeout=15)
+    except Exception as e:
+        return False, f"GitHub PUT failed: {e}"
+
+    if r.status_code in (200, 201):
+        return True, "saved"
+    return False, f"GitHub PUT returned {r.status_code}: {r.text[:200]}"
