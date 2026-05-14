@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 from datetime import date, timedelta
 
 import pandas as pd
 import streamlit as st
 
 import exclude_list
-from calc import daily_balance_series, projected_balance
+from calc import daily_balance_series, max_buy, projected_balance
 from calendar_view import render_range
 from parsers import parse_checks, parse_omd_debt, parse_suppliers_debt
 from persistence import (
@@ -19,22 +20,36 @@ from persistence import (
     save_to_github,
 )
 
-st.set_page_config(page_title="Cash Flow Calendar", layout="wide")
+st.set_page_config(page_title="Cash Flow Calendar", layout="wide", page_icon="💰")
 
 
-# ---------- password gate ----------
+# ---------- password gate with remember-me ----------
+def _expected_token(pw: str) -> str:
+    return hashlib.sha256(("cashflow:" + pw).encode()).hexdigest()[:32]
+
+
 def _check_password() -> bool:
     expected = st.secrets.get("app_password", "")
     if not expected:
         st.error("App password not configured. Set `app_password` in Streamlit secrets.")
         return False
+
+    token = _expected_token(expected)
+    if st.query_params.get("t") == token:
+        st.session_state["auth_ok"] = True
+
     if st.session_state.get("auth_ok"):
         return True
+
     st.title("🔒 Cash Flow Calendar")
+    st.caption("Enter the password to continue. Tick 'Remember me' and bookmark the URL to skip this next time.")
     pw = st.text_input("Password", type="password", key="_pw_in")
-    if st.button("Enter") and pw:
+    remember = st.checkbox("Remember me on this device", value=True)
+    if st.button("Enter", type="primary") and pw:
         if pw == expected:
             st.session_state["auth_ok"] = True
+            if remember:
+                st.query_params["t"] = token
             st.rerun()
         else:
             st.error("Incorrect password.")
@@ -202,7 +217,21 @@ inflows = ss.payments_in
 outflows = _outflows()
 
 if outflows.empty and inflows.empty:
-    st.info("Upload your 3 Excel files in the sidebar and click **Parse uploads** to start.")
+    st.markdown(
+        """
+        <div style='padding:20px;border-radius:12px;background:#f0f7ff;border:1px solid #c9def0;'>
+            <h3 style='margin-top:0'>👋 Welcome</h3>
+            <p>To get started, upload the 3 Excel files in the left sidebar:</p>
+            <ul>
+                <li><b>Checks</b> — Israeli supplier checks (column: <code>TTL Invoice</code>, <code>תאריך תחזית</code>)</li>
+                <li><b>Suppliers Debt</b> — Foreign supplier balances (<code>יתרה לתשלום</code>, <code>Due Date</code>)</li>
+                <li><b>OMD Debt</b> — Customer receivables (<code>Debit Amount</code>, <code>תאריך ערך</code>)</li>
+            </ul>
+            <p>Then click <b>Parse uploads</b>. Your data and bank balance are saved to the cloud so other users (and you, next time) see the latest state.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.stop()
 
 # summary cards
@@ -215,6 +244,27 @@ c1.metric("Current bank", f"${ss.current_bank:,.0f}")
 c2.metric("Receivables (in)", f"${total_in:,.0f}")
 c3.metric("Payments (out)", f"${total_out:,.0f}")
 c4.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
+
+# Today's recommendation hero card
+st.markdown("### 🎯 Today's buy budget")
+today_terms_html = []
+for t in terms_days:
+    val = max_buy(today, t, ss.current_bank, inflows, outflows, ss.safety_buffer)
+    label = "Cash today" if t == 0 else f"{t} days"
+    if val > 0:
+        amt_str = f"${val/1_000_000:.2f}M" if val >= 1_000_000 else f"${val/1_000:.1f}K" if val >= 1_000 else f"${val:.0f}"
+        bg, fg = "#e6f4ea", "#137333"
+        body = f"<div style='font-size:13px;opacity:0.7'>{label}</div><div style='font-size:22px;font-weight:600'>{amt_str}</div>"
+    else:
+        bg, fg = "#fce8e6", "#a50e0e"
+        body = f"<div style='font-size:13px;opacity:0.7'>{label}</div><div style='font-size:22px;font-weight:600'>—</div>"
+    today_terms_html.append(
+        f"<div style='flex:1;padding:14px;border-radius:10px;background:{bg};color:{fg};min-width:120px;text-align:center'>{body}</div>"
+    )
+st.markdown(
+    f"<div style='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px'>{''.join(today_terms_html)}</div>",
+    unsafe_allow_html=True,
+)
 
 tab_cal, tab_chart, tab_data, tab_day = st.tabs(
     ["📅 Calendar", "📈 Balance chart", "🗂 Raw data", "🔍 Daily detail"]
