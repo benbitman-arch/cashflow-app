@@ -52,6 +52,24 @@ _CSS = """
 .cf-row .val { font-weight: 600; white-space: nowrap; }
 .cf-positive { color: #0d652d; }
 .cf-negative { color: #b71c1c; }
+.cf-week-summary {
+    display: flex;
+    gap: 12px;
+    padding: 8px 12px;
+    margin: 4px 0 10px 0;
+    background: #f5f7fa;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #444;
+    flex-wrap: wrap;
+}
+.cf-week-summary .label {
+    font-weight: 600;
+    margin-right: 4px;
+}
+.cf-week-summary .out { color: #b71c1c; }
+.cf-week-summary .in { color: #0d652d; }
+.cf-week-summary .net { color: #1a73e8; }
 @media (max-width: 720px) {
     .cf-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
     .cf-header { display: none !important; }
@@ -110,6 +128,46 @@ def _cell_html(
     )
 
 
+def _week_summary_html(
+    week_start: date,
+    week_end: date,
+    inflows: pd.DataFrame,
+    outflows: pd.DataFrame,
+) -> str:
+    out_w = (
+        float(
+            outflows.loc[
+                (outflows["due_date"] >= week_start) & (outflows["due_date"] <= week_end),
+                "amount_usd",
+            ].sum()
+        )
+        if not outflows.empty
+        else 0.0
+    )
+    in_w = (
+        float(
+            inflows.loc[
+                (inflows["value_date"] >= week_start) & (inflows["value_date"] <= week_end),
+                "amount_usd",
+            ].sum()
+        )
+        if not inflows.empty
+        else 0.0
+    )
+    net_w = in_w - out_w
+    net_class = "in" if net_w >= 0 else "out"
+    net_sign = "+" if net_w >= 0 else "−"
+    label = f"Week of {week_start.strftime('%b %d')}"
+    return (
+        f"<div class='cf-week-summary'>"
+        f"<span class='label'>{label}</span>"
+        f"<span class='out'>↓ Pay: {_fmt_money(out_w)}</span>"
+        f"<span class='in'>↑ Receive: {_fmt_money(in_w)}</span>"
+        f"<span class='{net_class}'>Net: {net_sign}{_fmt_money(abs(net_w))}</span>"
+        f"</div>"
+    )
+
+
 def render_month(
     year: int,
     month: int,
@@ -127,14 +185,17 @@ def render_month(
     header_html = "<div class='cf-header'>" + "".join(
         f"<div class='cf-weekday'>{w}</div>" for w in weekday_names
     ) + "</div>"
+    st.markdown(header_html, unsafe_allow_html=True)
 
-    cells = []
     for week in weeks:
+        cells = []
+        week_dates = []
         for i, day in enumerate(week):
             if day == 0:
                 cells.append("<div></div>")
                 continue
             d = date(year, month, day)
+            week_dates.append(d)
             cells.append(
                 _cell_html(
                     d,
@@ -148,8 +209,12 @@ def render_month(
                     safety_buffer,
                 )
             )
-    grid_html = "<div class='cf-grid'>" + "".join(cells) + "</div>"
-    st.markdown(header_html + grid_html, unsafe_allow_html=True)
+        grid_html = "<div class='cf-grid'>" + "".join(cells) + "</div>"
+        if week_dates:
+            summary = _week_summary_html(min(week_dates), max(week_dates), inflows, outflows)
+        else:
+            summary = ""
+        st.markdown(grid_html + summary, unsafe_allow_html=True)
 
 
 def render_range(

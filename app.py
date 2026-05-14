@@ -391,27 +391,72 @@ if outflows.empty and inflows.empty:
 # summary cards
 total_in = float(inflows["amount_usd"].sum()) if not inflows.empty else 0.0
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
+overdue_amt = (
+    float(outflows.loc[outflows["due_date"] <= today, "amount_usd"].sum())
+    if not outflows.empty
+    else 0.0
+)
+already_in_amt = (
+    float(inflows.loc[inflows["value_date"] <= today, "amount_usd"].sum())
+    if not inflows.empty
+    else 0.0
+)
+cash_now = ss.current_bank + already_in_amt - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Current bank", f"${ss.current_bank:,.0f}")
-c2.metric("Receivables (in)", f"${total_in:,.0f}")
-c3.metric("Payments (out)", f"${total_out:,.0f}")
+c2.metric(
+    "Cash now (after overdue)",
+    f"${cash_now:,.0f}",
+    delta=f"-${overdue_amt:,.0f} overdue" if overdue_amt > 0 else None,
+    delta_color="inverse",
+)
+c3.metric("Receivables outstanding", f"${total_in:,.0f}")
 c4.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 
-# Today's recommendation hero card
+if overdue_amt > 0 and cash_now < 0:
+    st.error(
+        f"⚠️ Outstanding payments due by today (${overdue_amt:,.0f}) exceed your current "
+        f"bank + received payments (${ss.current_bank + already_in_amt:,.0f}) by "
+        f"${-cash_now:,.0f}. You're cash-negative right now."
+    )
+
+# Today's recommendation hero card — shows actual balance even when negative
 st.markdown("### 🎯 Today's buy budget")
+
+
+def _fmt_money_signed(x: float) -> str:
+    sign = "-" if x < 0 else ""
+    a = abs(x)
+    if a >= 1_000_000:
+        return f"{sign}${a/1_000_000:.2f}M"
+    if a >= 1_000:
+        return f"{sign}${a/1_000:.1f}K"
+    return f"{sign}${a:.0f}"
+
+
 today_terms_html = []
 for t in terms_days:
-    val = max_buy(today, t, ss.current_bank, inflows, outflows, ss.safety_buffer)
+    raw = projected_balance(
+        today + timedelta(days=t), ss.current_bank, inflows, outflows
+    ) - ss.safety_buffer
     label = "Cash today" if t == 0 else f"{t} days"
-    if val > 0:
-        amt_str = f"${val/1_000_000:.2f}M" if val >= 1_000_000 else f"${val/1_000:.1f}K" if val >= 1_000 else f"${val:.0f}"
+    if raw > 0:
         bg, fg = "#e6f4ea", "#137333"
-        body = f"<div style='font-size:13px;opacity:0.7'>{label}</div><div style='font-size:22px;font-weight:600'>{amt_str}</div>"
+        sub = "can buy"
+    elif raw == 0:
+        bg, fg = "#fff4e5", "#b06000"
+        sub = "exactly $0"
     else:
         bg, fg = "#fce8e6", "#a50e0e"
-        body = f"<div style='font-size:13px;opacity:0.7'>{label}</div><div style='font-size:22px;font-weight:600'>—</div>"
+        sub = "deficit"
+    amt_str = _fmt_money_signed(raw)
+    body = (
+        f"<div style='font-size:13px;opacity:0.7'>{label}</div>"
+        f"<div style='font-size:22px;font-weight:600'>{amt_str}</div>"
+        f"<div style='font-size:11px;opacity:0.7'>{sub}</div>"
+    )
     today_terms_html.append(
         f"<div style='flex:1;padding:14px;border-radius:10px;background:{bg};color:{fg};min-width:120px;text-align:center'>{body}</div>"
     )
