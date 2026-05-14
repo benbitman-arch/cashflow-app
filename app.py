@@ -186,59 +186,78 @@ with st.sidebar:
 
     st.divider()
     st.header("Settings")
-    new_bank = st.number_input(
-        "Current bank balance (USD)", value=float(ss.current_bank), step=1000.0, format="%.2f"
-    )
-    new_buffer = st.number_input(
-        "Safety buffer (USD)", value=float(ss.safety_buffer), step=1000.0, format="%.2f"
-    )
-    new_terms = st.text_input("Buy terms (days, comma-separated)", value=ss.terms_days_str)
 
-    st.markdown("##### 📈 Projected sales")
+    def _parse_money(s: str, fallback: float) -> float:
+        try:
+            return float(str(s).replace(",", "").replace(" ", "").replace("$", ""))
+        except (ValueError, TypeError):
+            return fallback
+
+    def _parse_int(s: str, fallback: int) -> int:
+        try:
+            return int(float(str(s).replace(",", "").replace(" ", "")))
+        except (ValueError, TypeError):
+            return fallback
+
     detected_avg = compute_avg_customer_terms(ss.payments_in)
-    if detected_avg is not None:
-        st.caption(
-            f"Detected average customer term from OMD data: **{detected_avg:.0f} days** "
-            f"(weighted by amount)"
-        )
-    new_weekly_sales = st.number_input(
-        "Weekly projected sales (USD)",
-        value=float(ss.weekly_sales),
-        step=10000.0,
-        format="%.2f",
-        help="Average new sales we book each week. Used to project future receivables.",
-    )
-    default_terms = int(round(detected_avg)) if detected_avg is not None else int(ss.customer_terms_days)
-    new_cust_terms = st.number_input(
-        "Customer terms (days until we get paid)",
-        value=int(ss.customer_terms_days or default_terms),
-        min_value=0,
-        max_value=365,
-        step=1,
-        help="Days from sale to cash. Defaults to the detected average.",
+    default_cust_terms = (
+        int(round(detected_avg)) if detected_avg is not None else int(ss.customer_terms_days)
     )
 
-    st.markdown("##### 🏢 FM Trading (sister company)")
-    new_fm_weekly = st.number_input(
-        "FM Trading weekly deposit (USD)",
-        value=float(ss.fm_trading_weekly),
-        step=10000.0,
-        format="%.2f",
-        help="FM Trading buys through the Israel office and deposits into the same bank weekly. Added directly to inflows (no terms delay).",
-    )
+    with st.form("settings_form", border=False):
+        bank_str = st.text_input(
+            "Current bank balance (USD)", value=f"{ss.current_bank:,.2f}"
+        )
+        buffer_str = st.text_input(
+            "Safety buffer (USD)", value=f"{ss.safety_buffer:,.2f}"
+        )
+        new_terms = st.text_input(
+            "Buy terms (days, comma-separated)", value=ss.terms_days_str
+        )
+
+        st.markdown("##### 📈 Projected sales")
+        if detected_avg is not None:
+            st.caption(
+                f"Detected average customer term from OMD data: **{detected_avg:.0f} days** "
+                f"(weighted by amount)"
+            )
+        weekly_sales_str = st.text_input(
+            "Weekly projected sales (USD)",
+            value=f"{ss.weekly_sales:,.2f}",
+            help="Average new sales we book each week. Projected into future receivables.",
+        )
+        cust_terms_str = st.text_input(
+            "Customer terms (days until we get paid)",
+            value=str(int(ss.customer_terms_days or default_cust_terms)),
+            help="Days from sale to cash. Defaults to the detected average.",
+        )
+
+        st.markdown("##### 🏢 FM Trading (sister company)")
+        fm_weekly_str = st.text_input(
+            "FM Trading weekly deposit (USD)",
+            value=f"{ss.fm_trading_weekly:,.2f}",
+            help="FM Trading deposits weekly into the Israel bank. Added directly to inflows (no terms delay).",
+        )
+
+        submitted = st.form_submit_button(
+            "✅ Apply", use_container_width=True, type="primary"
+        )
+
+    if submitted:
+        ss.current_bank = _parse_money(bank_str, ss.current_bank)
+        ss.safety_buffer = _parse_money(buffer_str, ss.safety_buffer)
+        ss.terms_days_str = new_terms
+        ss.weekly_sales = _parse_money(weekly_sales_str, ss.weekly_sales)
+        ss.customer_terms_days = max(
+            0, min(365, _parse_int(cust_terms_str, ss.customer_terms_days))
+        )
+        ss.fm_trading_weekly = _parse_money(fm_weekly_str, ss.fm_trading_weekly)
+
     try:
-        terms_days = [int(x.strip()) for x in new_terms.split(",") if x.strip()]
+        terms_days = [int(x.strip()) for x in ss.terms_days_str.split(",") if x.strip()]
     except ValueError:
         st.error("Terms must be integers separated by commas, e.g. 0,30,45,60,75")
         terms_days = [0, 30, 45, 60, 75]
-
-    # Apply input values to session state every rerun (cheap; calendar reflects live values).
-    ss.current_bank = float(new_bank)
-    ss.safety_buffer = float(new_buffer)
-    ss.terms_days_str = new_terms
-    ss.weekly_sales = float(new_weekly_sales)
-    ss.customer_terms_days = int(new_cust_terms)
-    ss.fm_trading_weekly = float(new_fm_weekly)
 
     # Auto-save to cloud whenever a setting changed compared to the last persisted state.
     current_settings = (
@@ -253,7 +272,7 @@ with st.sidebar:
         ss.last_saved_settings = current_settings
         _push_snapshot("settings auto-save")
     else:
-        st.caption("☁️ Settings auto-save to cloud when you change them")
+        st.caption("☁️ Click Apply to commit changes — they auto-save to cloud")
 
     today = date.today()
     horizon = st.slider("Calendar horizon (days)", 30, 180, 90, step=30)
