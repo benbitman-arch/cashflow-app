@@ -76,7 +76,12 @@ class ParseResult:
 
 
 def parse_checks(file) -> ParseResult:
-    """Israeli supplier checks (Checks May14.xls)."""
+    """Israeli supplier checks (Checks May14.xls).
+
+    Past-dated checks have already auto-deducted from the bank account, so
+    they're already reflected in the user's current bank balance and we skip
+    them to avoid double-counting in the forward projection.
+    """
     df = _read_excel(file)
     name_col = _find_col(df, ["שם"], "Checks file (supplier name)")
     date_col = _find_col(df, ["תאריך תחזית"], "Checks file (due date)")
@@ -87,6 +92,7 @@ def parse_checks(file) -> ParseResult:
     except ValueError:
         pass
 
+    today = date.today()
     out, dropped, warns = [], [], []
     for _, r in df.iterrows():
         amt = r[amount_col]
@@ -95,6 +101,16 @@ def parse_checks(file) -> ParseResult:
         d = _to_date(r[date_col])
         if d is None:
             dropped.append({"reason": "missing date", "row": r.to_dict()})
+            continue
+        if d < today:
+            dropped.append(
+                {
+                    "reason": "past-dated check (already cleared)",
+                    "name": str(r[name_col]).strip(),
+                    "amount": float(amt),
+                    "date": d,
+                }
+            )
             continue
         out.append(
             {
