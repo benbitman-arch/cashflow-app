@@ -61,6 +61,29 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
     return float((df["gap"] * df["amount_usd"]).sum() / df["amount_usd"].sum())
 
 
+def project_fm_deposits(start: date, end: date, weekly_amount: float) -> pd.DataFrame:
+    """Generate synthetic weekly inflows for FM Trading's recurring bank deposits.
+
+    Deposits land same-day (no terms gap), every 7 days from `start`.
+    """
+    if weekly_amount <= 0:
+        return pd.DataFrame()
+    rows = []
+    d = start
+    while d <= end:
+        rows.append(
+            {
+                "source": "fm_trading",
+                "party": f"FM Trading ({d.isoformat()})",
+                "amount_usd": float(weekly_amount),
+                "value_date": d,
+                "info": "weekly deposit",
+            }
+        )
+        d += timedelta(days=7)
+    return pd.DataFrame(rows)
+
+
 def project_future_sales(
     start: date,
     end: date,

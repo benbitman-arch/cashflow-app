@@ -13,6 +13,7 @@ from calc import (
     compute_avg_customer_terms,
     daily_balance_series,
     max_buy,
+    project_fm_deposits,
     project_future_sales,
     projected_balance,
 )
@@ -77,6 +78,7 @@ ss.setdefault("safety_buffer", 0.0)
 ss.setdefault("terms_days_str", "0,30,45,60,75")
 ss.setdefault("weekly_sales", 0.0)
 ss.setdefault("customer_terms_days", 30)
+ss.setdefault("fm_trading_weekly", 0.0)
 ss.setdefault("snapshot_saved_at", None)
 ss.setdefault("last_saved_settings", None)
 
@@ -97,6 +99,8 @@ if not ss.loaded:
             ss.weekly_sales = float(parsed["weekly_sales"])
         if parsed.get("customer_terms_days") is not None:
             ss.customer_terms_days = int(parsed["customer_terms_days"])
+        if parsed.get("fm_trading_weekly") is not None:
+            ss.fm_trading_weekly = float(parsed["fm_trading_weekly"])
         ss.snapshot_saved_at = parsed.get("saved_at")
     # Mark the just-loaded settings as the baseline so we don't immediately re-save.
     ss.last_saved_settings = (
@@ -105,6 +109,7 @@ if not ss.loaded:
         ss.terms_days_str,
         ss.weekly_sales,
         ss.customer_terms_days,
+        ss.fm_trading_weekly,
     )
     ss.loaded = True
 
@@ -134,6 +139,7 @@ def _push_snapshot(reason: str) -> None:
         terms_days=terms_days,
         weekly_sales=ss.weekly_sales,
         customer_terms_days=ss.customer_terms_days,
+        fm_trading_weekly=ss.fm_trading_weekly,
     )
     ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
     if ok:
@@ -211,6 +217,15 @@ with st.sidebar:
         step=1,
         help="Days from sale to cash. Defaults to the detected average.",
     )
+
+    st.markdown("##### 🏢 FM Trading (sister company)")
+    new_fm_weekly = st.number_input(
+        "FM Trading weekly deposit (USD)",
+        value=float(ss.fm_trading_weekly),
+        step=10000.0,
+        format="%.2f",
+        help="FM Trading buys through the Israel office and deposits into the same bank weekly. Added directly to inflows (no terms delay).",
+    )
     try:
         terms_days = [int(x.strip()) for x in new_terms.split(",") if x.strip()]
     except ValueError:
@@ -223,6 +238,7 @@ with st.sidebar:
     ss.terms_days_str = new_terms
     ss.weekly_sales = float(new_weekly_sales)
     ss.customer_terms_days = int(new_cust_terms)
+    ss.fm_trading_weekly = float(new_fm_weekly)
 
     # Auto-save to cloud whenever a setting changed compared to the last persisted state.
     current_settings = (
@@ -231,6 +247,7 @@ with st.sidebar:
         ss.terms_days_str,
         ss.weekly_sales,
         ss.customer_terms_days,
+        ss.fm_trading_weekly,
     )
     if ss.last_saved_settings != current_settings:
         ss.last_saved_settings = current_settings
@@ -263,11 +280,9 @@ st.title("💰 Cash Flow Calendar")
 
 existing_inflows = ss.payments_in
 projected = project_future_sales(today, end_date, ss.weekly_sales, ss.customer_terms_days)
-inflows = (
-    pd.concat([existing_inflows, projected], ignore_index=True)
-    if not projected.empty
-    else existing_inflows
-)
+fm_deposits = project_fm_deposits(today, end_date, ss.fm_trading_weekly)
+inflow_parts = [df for df in [existing_inflows, projected, fm_deposits] if not df.empty]
+inflows = pd.concat(inflow_parts, ignore_index=True) if inflow_parts else pd.DataFrame()
 outflows = _outflows()
 
 if outflows.empty and inflows.empty:

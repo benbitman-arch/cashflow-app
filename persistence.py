@@ -64,9 +64,10 @@ def build_snapshot(
     terms_days: list[int],
     weekly_sales: float = 0.0,
     customer_terms_days: int = 30,
+    fm_trading_weekly: float = 0.0,
 ) -> dict[str, Any]:
     return {
-        "version": 2,
+        "version": 3,
         "saved_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
         "payments_out_by_source": {
             src: _serialize_df(df) for src, df in payments_out_by_source.items()
@@ -78,6 +79,7 @@ def build_snapshot(
         "terms_days": list(terms_days),
         "weekly_sales": float(weekly_sales),
         "customer_terms_days": int(customer_terms_days),
+        "fm_trading_weekly": float(fm_trading_weekly),
     }
 
 
@@ -98,6 +100,7 @@ def parse_snapshot(snap: dict[str, Any]) -> dict[str, Any]:
         "terms_days": list(snap.get("terms_days") or [0, 30, 45, 60, 75]),
         "weekly_sales": float(snap.get("weekly_sales") or 0),
         "customer_terms_days": int(snap.get("customer_terms_days") or 30),
+        "fm_trading_weekly": float(snap.get("fm_trading_weekly") or 0),
         "saved_at": snap.get("saved_at"),
     }
 
