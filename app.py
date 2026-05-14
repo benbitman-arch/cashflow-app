@@ -401,12 +401,24 @@ net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Current bank", f"${ss.current_bank:,.0f}")
-c2.metric(
-    "Cash now (after overdue)",
-    f"${cash_now:,.0f}",
-    delta=f"-${overdue_amt:,.0f} overdue" if overdue_amt > 0 else None,
-    delta_color="inverse",
+
+# Custom 'Cash now' metric so we can color the value red when negative
+cash_color = "#b71c1c" if cash_now < 0 else ("#0d652d" if cash_now > 0 else "#444")
+sign = "-$" if cash_now < 0 else "$"
+cash_value_str = f"{sign}{abs(cash_now):,.0f}"
+overdue_html = (
+    f"<div style='font-size:13px;color:#b71c1c;margin-top:4px'>"
+    f"⚠️ ${overdue_amt:,.0f} overdue</div>"
+    if overdue_amt > 0
+    else ""
 )
+c2.markdown(
+    f"<div style='font-size:14px;color:#666'>Cash now (after overdue)</div>"
+    f"<div style='font-size:32px;font-weight:600;color:{cash_color};line-height:1.3'>{cash_value_str}</div>"
+    f"{overdue_html}",
+    unsafe_allow_html=True,
+)
+
 c3.metric("Receivables outstanding", f"${total_in:,.0f}")
 c4.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 

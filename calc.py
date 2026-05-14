@@ -34,10 +34,18 @@ def max_buy(
     outflows: pd.DataFrame,
     safety_buffer: float = 0.0,
 ) -> float:
-    """Max USD I can commit to buying on `decision_date` with payment in `term_days` days."""
+    """Max USD I can commit to buying on `decision_date` with payment in `term_days` days.
+
+    Returns 0 if we are below the safety buffer on the decision date itself —
+    you can't take on new commitments while you're already in deficit; you
+    must close the deficit first.
+    """
+    bal_now = projected_balance(decision_date, current_bank, inflows, outflows)
+    if bal_now < safety_buffer:
+        return 0.0
     payment_day = decision_date + timedelta(days=term_days)
-    bal = projected_balance(payment_day, current_bank, inflows, outflows)
-    return max(0.0, bal - safety_buffer)
+    bal_then = projected_balance(payment_day, current_bank, inflows, outflows)
+    return max(0.0, bal_then - safety_buffer)
 
 
 def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
