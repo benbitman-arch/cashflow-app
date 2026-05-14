@@ -78,12 +78,13 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
 def project_fm_deposits(start: date, end: date, weekly_amount: float) -> pd.DataFrame:
     """Generate synthetic weekly inflows for FM Trading's recurring bank deposits.
 
-    Deposits land same-day (no terms gap), every 7 days from `start`.
+    First deposit lands `start + 7 days` (not on `start` itself, since the
+    user-entered bank balance already reflects anything that has arrived).
     """
     if weekly_amount <= 0:
         return pd.DataFrame()
     rows = []
-    d = start
+    d = start + timedelta(days=7)
     while d <= end:
         rows.append(
             {
@@ -106,13 +107,14 @@ def project_future_sales(
 ) -> pd.DataFrame:
     """Generate synthetic weekly receivables for projected future sales.
 
-    Each week starting `start` we book `weekly_sales` of revenue that arrives
-    `customer_terms_days` later. Used as additive inflow on top of existing OMD.
+    First sale week begins `start + 7 days` (not `start` itself), so we don't
+    project new revenue for a week that has already partially passed and
+    whose actual sales would already be visible in the OMD file.
     """
     if weekly_sales <= 0:
         return pd.DataFrame()
     rows = []
-    sale_date = start
+    sale_date = start + timedelta(days=7)
     while sale_date <= end:
         rows.append(
             {
