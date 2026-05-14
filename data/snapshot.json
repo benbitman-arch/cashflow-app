@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "saved_at": "2026-05-14T16:15:09Z",
+  "version": 2,
+  "saved_at": "2026-05-14T16:33:00Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -11004,7 +11004,7 @@
       "value_date": null
     }
   ],
-  "current_bank": 0.0,
+  "current_bank": 2000000.0,
   "safety_buffer": 0.0,
   "terms_days": [
     0,
@@ -11012,5 +11012,7 @@
     45,
     60,
     75
-  ]
+  ],
+  "weekly_sales": 0.0,
+  "customer_terms_days": 30
 }
