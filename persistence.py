@@ -62,9 +62,11 @@ def build_snapshot(
     current_bank: float,
     safety_buffer: float,
     terms_days: list[int],
+    weekly_sales: float = 0.0,
+    customer_terms_days: int = 30,
 ) -> dict[str, Any]:
     return {
-        "version": 1,
+        "version": 2,
         "saved_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
         "payments_out_by_source": {
             src: _serialize_df(df) for src, df in payments_out_by_source.items()
@@ -74,6 +76,8 @@ def build_snapshot(
         "current_bank": float(current_bank),
         "safety_buffer": float(safety_buffer),
         "terms_days": list(terms_days),
+        "weekly_sales": float(weekly_sales),
+        "customer_terms_days": int(customer_terms_days),
     }
 
 
@@ -84,11 +88,16 @@ def parse_snapshot(snap: dict[str, Any]) -> dict[str, Any]:
     }
     return {
         "payments_out_by_source": payments_out_by_source,
-        "payments_in": _deserialize_df(snap.get("payments_in") or [], ["value_date"]),
+        "payments_in": _deserialize_df(
+            snap.get("payments_in") or [],
+            ["value_date", "reference_date", "original_value_date"],
+        ),
         "excluded_omd": _deserialize_df(snap.get("excluded_omd") or [], ["value_date"]),
         "current_bank": float(snap.get("current_bank") or 0),
         "safety_buffer": float(snap.get("safety_buffer") or 0),
         "terms_days": list(snap.get("terms_days") or [0, 30, 45, 60, 75]),
+        "weekly_sales": float(snap.get("weekly_sales") or 0),
+        "customer_terms_days": int(snap.get("customer_terms_days") or 30),
         "saved_at": snap.get("saved_at"),
     }
 

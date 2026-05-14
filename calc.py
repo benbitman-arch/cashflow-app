@@ -40,6 +40,56 @@ def max_buy(
     return max(0.0, bal - safety_buffer)
 
 
+def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
+    """Amount-weighted average days between invoice (reference_date) and payment (value_date).
+
+    Returns None if the input lacks reference_date or has no usable rows.
+    """
+    if inflows is None or inflows.empty:
+        return None
+    if "reference_date" not in inflows.columns:
+        return None
+    val_col = "original_value_date" if "original_value_date" in inflows.columns else "value_date"
+    df = inflows[["reference_date", val_col, "amount_usd"]].copy()
+    df = df.dropna(subset=["reference_date", val_col])
+    if df.empty:
+        return None
+    df["gap"] = (pd.to_datetime(df[val_col]) - pd.to_datetime(df["reference_date"])).dt.days
+    df = df[(df["gap"] >= 0) & (df["gap"] <= 365) & (df["amount_usd"] > 0)]
+    if df.empty:
+        return None
+    return float((df["gap"] * df["amount_usd"]).sum() / df["amount_usd"].sum())
+
+
+def project_future_sales(
+    start: date,
+    end: date,
+    weekly_sales: float,
+    customer_terms_days: int,
+) -> pd.DataFrame:
+    """Generate synthetic weekly receivables for projected future sales.
+
+    Each week starting `start` we book `weekly_sales` of revenue that arrives
+    `customer_terms_days` later. Used as additive inflow on top of existing OMD.
+    """
+    if weekly_sales <= 0:
+        return pd.DataFrame()
+    rows = []
+    sale_date = start
+    while sale_date <= end:
+        rows.append(
+            {
+                "source": "projected_sales",
+                "party": f"projected ({sale_date.isoformat()})",
+                "amount_usd": float(weekly_sales),
+                "value_date": sale_date + timedelta(days=int(customer_terms_days)),
+                "info": "",
+            }
+        )
+        sale_date += timedelta(days=7)
+    return pd.DataFrame(rows)
+
+
 def daily_balance_series(
     start: date,
     end: date,

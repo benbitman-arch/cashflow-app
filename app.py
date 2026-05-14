@@ -9,7 +9,13 @@ import pandas as pd
 import streamlit as st
 
 import exclude_list
-from calc import daily_balance_series, max_buy, projected_balance
+from calc import (
+    compute_avg_customer_terms,
+    daily_balance_series,
+    max_buy,
+    project_future_sales,
+    projected_balance,
+)
 from calendar_view import render_range
 from parsers import parse_checks, parse_omd_debt, parse_suppliers_debt
 from persistence import (
@@ -69,6 +75,8 @@ ss.setdefault("loaded", False)
 ss.setdefault("current_bank", 0.0)
 ss.setdefault("safety_buffer", 0.0)
 ss.setdefault("terms_days_str", "0,30,45,60,75")
+ss.setdefault("weekly_sales", 0.0)
+ss.setdefault("customer_terms_days", 30)
 ss.setdefault("snapshot_saved_at", None)
 
 GH_TOKEN = st.secrets.get("github_token", "")
@@ -84,6 +92,10 @@ if not ss.loaded:
         ss.current_bank = parsed["current_bank"]
         ss.safety_buffer = parsed["safety_buffer"]
         ss.terms_days_str = ",".join(str(t) for t in parsed["terms_days"])
+        if parsed.get("weekly_sales") is not None:
+            ss.weekly_sales = float(parsed["weekly_sales"])
+        if parsed.get("customer_terms_days") is not None:
+            ss.customer_terms_days = int(parsed["customer_terms_days"])
         ss.snapshot_saved_at = parsed.get("saved_at")
     ss.loaded = True
 
@@ -111,6 +123,8 @@ def _push_snapshot(reason: str) -> None:
         current_bank=ss.current_bank,
         safety_buffer=ss.safety_buffer,
         terms_days=terms_days,
+        weekly_sales=ss.weekly_sales,
+        customer_terms_days=ss.customer_terms_days,
     )
     ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
     if ok:
@@ -163,7 +177,31 @@ with st.sidebar:
     new_buffer = st.number_input(
         "Safety buffer (USD)", value=float(ss.safety_buffer), step=1000.0, format="%.2f"
     )
-    new_terms = st.text_input("Terms (days, comma-separated)", value=ss.terms_days_str)
+    new_terms = st.text_input("Buy terms (days, comma-separated)", value=ss.terms_days_str)
+
+    st.markdown("##### 📈 Projected sales")
+    detected_avg = compute_avg_customer_terms(ss.payments_in)
+    if detected_avg is not None:
+        st.caption(
+            f"Detected average customer term from OMD data: **{detected_avg:.0f} days** "
+            f"(weighted by amount)"
+        )
+    new_weekly_sales = st.number_input(
+        "Weekly projected sales (USD)",
+        value=float(ss.weekly_sales),
+        step=10000.0,
+        format="%.2f",
+        help="Average new sales we book each week. Used to project future receivables.",
+    )
+    default_terms = int(round(detected_avg)) if detected_avg is not None else int(ss.customer_terms_days)
+    new_cust_terms = st.number_input(
+        "Customer terms (days until we get paid)",
+        value=int(ss.customer_terms_days or default_terms),
+        min_value=0,
+        max_value=365,
+        step=1,
+        help="Days from sale to cash. Defaults to the detected average.",
+    )
     try:
         terms_days = [int(x.strip()) for x in new_terms.split(",") if x.strip()]
     except ValueError:
@@ -174,6 +212,8 @@ with st.sidebar:
         new_bank != ss.current_bank
         or new_buffer != ss.safety_buffer
         or new_terms != ss.terms_days_str
+        or new_weekly_sales != ss.weekly_sales
+        or new_cust_terms != ss.customer_terms_days
     )
     if st.button(
         "💾 Save settings to cloud",
@@ -183,12 +223,16 @@ with st.sidebar:
         ss.current_bank = float(new_bank)
         ss.safety_buffer = float(new_buffer)
         ss.terms_days_str = new_terms
+        ss.weekly_sales = float(new_weekly_sales)
+        ss.customer_terms_days = int(new_cust_terms)
         _push_snapshot("settings change")
     else:
         # apply in-session even without save, so calendar reflects current inputs
         ss.current_bank = float(new_bank)
         ss.safety_buffer = float(new_buffer)
         ss.terms_days_str = new_terms
+        ss.weekly_sales = float(new_weekly_sales)
+        ss.customer_terms_days = int(new_cust_terms)
 
     today = date.today()
     horizon = st.slider("Calendar horizon (days)", 30, 180, 90, step=30)
@@ -213,7 +257,13 @@ with st.sidebar:
 # ---------- main pane ----------
 st.title("💰 Cash Flow Calendar")
 
-inflows = ss.payments_in
+existing_inflows = ss.payments_in
+projected = project_future_sales(today, end_date, ss.weekly_sales, ss.customer_terms_days)
+inflows = (
+    pd.concat([existing_inflows, projected], ignore_index=True)
+    if not projected.empty
+    else existing_inflows
+)
 outflows = _outflows()
 
 if outflows.empty and inflows.empty:

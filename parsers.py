@@ -160,11 +160,20 @@ def parse_suppliers_debt(file) -> ParseResult:
 
 
 def parse_omd_debt(file) -> ParseResult:
-    """Customer receivables (OMD DEBT BEN.xls). Filters yellow-list names."""
+    """Customer receivables (OMD DEBT BEN.xls). Filters yellow-list names.
+
+    Keeps `reference_date` (תאריך התיחסות, invoice date) alongside `value_date`
+    so callers can compute average customer payment terms.
+    """
     df = _read_excel(file)
     name_col = _find_col(df, ["Customer Name"], "OMD Debt (customer name)")
     date_col = _find_col(df, ["תאריך ערך"], "OMD Debt (value date)")
     amount_col = _find_col(df, ["Debit Amount"], "OMD Debt (debit amount)")
+    ref_col = None
+    try:
+        ref_col = _find_col(df, ["תאריך התיחסות"], "OMD Debt (reference date)")
+    except ValueError:
+        pass
 
     today = date.today()
     out, dropped, warns = [], [], []
@@ -181,11 +190,13 @@ def parse_omd_debt(file) -> ParseResult:
         if d is None:
             dropped.append({"reason": "missing date", "name": name, "amount": amt})
             continue
+        ref_d = _to_date(r[ref_col]) if ref_col else None
         if is_excluded(name):
             dropped.append(
                 {"reason": "yellow exclude list", "name": name, "amount": amt, "value_date": d}
             )
             continue
+        original_value_date = d
         if d < today:
             d = today
         out.append(
@@ -194,6 +205,8 @@ def parse_omd_debt(file) -> ParseResult:
                 "party": name,
                 "amount_usd": amt,
                 "value_date": d,
+                "reference_date": ref_d,
+                "original_value_date": original_value_date,
                 "info": "",
             }
         )
