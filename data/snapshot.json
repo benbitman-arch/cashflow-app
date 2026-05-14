@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "saved_at": "2026-05-14T16:49:10Z",
+  "saved_at": "2026-05-14T16:50:09Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -11004,7 +11004,7 @@
       "value_date": "NaT"
     }
   ],
-  "current_bank": 0.0,
+  "current_bank": 10000.0,
   "safety_buffer": 0.0,
   "terms_days": [
     0,
