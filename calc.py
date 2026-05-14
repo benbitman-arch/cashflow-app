@@ -36,13 +36,25 @@ def max_buy(
 ) -> float:
     """Max USD I can commit to buying on `decision_date` with payment in `term_days` days.
 
-    Returns 0 if we are below the safety buffer on the decision date itself —
-    you can't take on new commitments while you're already in deficit; you
-    must close the deficit first.
+    Strict deficit gate: at the decision date, *real cash* (bank minus
+    everything we owe by then) must be at or above the safety buffer. This
+    matches the 'Cash now (after overdue)' headline number; when that is
+    negative, no terms allow a buy until the deficit is closed.
+
+    Once the gate is open, the actual buy budget is the future projected
+    balance at the payment day, which optimistically counts incoming
+    receivables.
     """
-    bal_now = projected_balance(decision_date, current_bank, inflows, outflows)
-    if bal_now < safety_buffer:
+    if outflows is not None and not outflows.empty:
+        owed_by_decision = float(
+            outflows.loc[outflows["due_date"] <= decision_date, "amount_usd"].sum()
+        )
+    else:
+        owed_by_decision = 0.0
+    real_cash_at_decision = current_bank - owed_by_decision
+    if real_cash_at_decision < safety_buffer:
         return 0.0
+
     payment_day = decision_date + timedelta(days=term_days)
     bal_then = projected_balance(payment_day, current_bank, inflows, outflows)
     return max(0.0, bal_then - safety_buffer)
