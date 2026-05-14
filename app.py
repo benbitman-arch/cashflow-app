@@ -8,6 +8,8 @@ from datetime import date, timedelta
 import pandas as pd
 import streamlit as st
 
+import streamlit.components.v1 as components
+
 import exclude_list
 from calc import (
     compute_avg_customer_terms,
@@ -28,6 +30,68 @@ from persistence import (
 )
 
 st.set_page_config(page_title="Cash Flow Calendar", layout="wide", page_icon="💰")
+
+
+# ---------- live comma formatting for money fields ----------
+_MONEY_FORMATTER_JS = """
+<script>
+(function () {
+  const doc = window.parent ? window.parent.document : document;
+  const setter = Object.getOwnPropertyDescriptor(
+    window.HTMLInputElement.prototype, 'value'
+  ).set;
+
+  function format(value) {
+    if (!value) return '';
+    let v = ('' + value).replace(/[^\\d.-]/g, '');
+    const dot = v.indexOf('.');
+    if (dot >= 0) v = v.slice(0, dot + 1) + v.slice(dot + 1).replace(/\\./g, '');
+    let [intPart, fracPart] = v.split('.');
+    intPart = (intPart || '').replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',');
+    return fracPart !== undefined ? intPart + '.' + fracPart : intPart;
+  }
+
+  function isMoney(input) {
+    const block = input.closest('[data-testid="stTextInput"]');
+    if (!block) return false;
+    const labelEl = block.querySelector('label');
+    const txt = (labelEl && labelEl.textContent) || input.getAttribute('aria-label') || '';
+    return /USD|balance|sales|deposit|buffer/i.test(txt);
+  }
+
+  function attach(input) {
+    if (input._mfAttached) return;
+    input._mfAttached = true;
+    input.addEventListener('input', function (e) {
+      const oldVal = e.target.value;
+      const cursor = e.target.selectionStart;
+      const newVal = format(oldVal);
+      if (newVal === oldVal) return;
+      setter.call(e.target, newVal);
+      const delta = newVal.length - oldVal.length;
+      try { e.target.setSelectionRange(cursor + delta, cursor + delta); } catch (_) {}
+      e.target.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  }
+
+  function scan() {
+    doc.querySelectorAll('input[type="text"]').forEach(function (inp) {
+      if (isMoney(inp)) attach(inp);
+    });
+  }
+
+  scan();
+  if (!doc._mfObserver) {
+    doc._mfObserver = new MutationObserver(scan);
+    doc._mfObserver.observe(doc.body, { childList: true, subtree: true });
+  }
+})();
+</script>
+"""
+
+
+def _inject_money_formatter():
+    components.html(_MONEY_FORMATTER_JS, height=0)
 
 
 # ---------- password gate with remember-me ----------
@@ -242,6 +306,8 @@ with st.sidebar:
         submitted = st.form_submit_button(
             "✅ Apply", use_container_width=True, type="primary"
         )
+
+    _inject_money_formatter()
 
     if submitted:
         ss.current_bank = _parse_money(bank_str, ss.current_bank)
