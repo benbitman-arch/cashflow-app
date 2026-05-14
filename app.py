@@ -206,10 +206,10 @@ with st.sidebar:
 
     with st.form("settings_form", border=False):
         bank_str = st.text_input(
-            "Current bank balance (USD)", value=f"{ss.current_bank:,.2f}"
+            "Current bank balance (USD)", value=f"{ss.current_bank:,.0f}"
         )
         buffer_str = st.text_input(
-            "Safety buffer (USD)", value=f"{ss.safety_buffer:,.2f}"
+            "Safety buffer (USD)", value=f"{ss.safety_buffer:,.0f}"
         )
         new_terms = st.text_input(
             "Buy terms (days, comma-separated)", value=ss.terms_days_str
@@ -223,7 +223,7 @@ with st.sidebar:
             )
         weekly_sales_str = st.text_input(
             "Weekly projected sales (USD)",
-            value=f"{ss.weekly_sales:,.2f}",
+            value=f"{ss.weekly_sales:,.0f}",
             help="Average new sales we book each week. Projected into future receivables.",
         )
         cust_terms_str = st.text_input(
@@ -235,7 +235,7 @@ with st.sidebar:
         st.markdown("##### 🏢 FM Trading (sister company)")
         fm_weekly_str = st.text_input(
             "FM Trading weekly deposit (USD)",
-            value=f"{ss.fm_trading_weekly:,.2f}",
+            value=f"{ss.fm_trading_weekly:,.0f}",
             help="FM Trading deposits weekly into the Israel bank. Added directly to inflows (no terms delay).",
         )
 
