@@ -396,6 +396,14 @@ overdue_amt = (
     if not outflows.empty
     else 0.0
 )
+overdue_receivables_amt = (
+    float(ss.excluded_omd.loc[
+        ss.excluded_omd["reason"] == "overdue (excluded from projection)",
+        "amount",
+    ].sum())
+    if not ss.excluded_omd.empty and "reason" in ss.excluded_omd.columns
+    else 0.0
+)
 cash_now = ss.current_bank - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
@@ -426,7 +434,14 @@ if overdue_amt > 0 and cash_now < 0:
     st.error(
         f"⚠️ Outstanding payments due by today (${overdue_amt:,.0f}) exceed your current "
         f"bank balance (${ss.current_bank:,.0f}) by ${-cash_now:,.0f}. "
-        f"You're cash-negative right now (before counting any incoming receivables)."
+        f"The calendar projects when you'll close this gap (assuming projected sales, "
+        f"FM Trading deposits, and on-time customer payments arrive)."
+    )
+
+if overdue_receivables_amt > 0:
+    st.info(
+        f"ℹ️ ${overdue_receivables_amt:,.0f} in overdue customer receivables are NOT counted "
+        f"in the projection (uncertain when/if they'll arrive). Visible in Raw data tab."
     )
 
 # Today's recommendation hero card — shows actual balance even when negative
