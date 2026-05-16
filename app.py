@@ -18,6 +18,7 @@ from calc import (
     project_fm_deposits,
     project_future_sales,
     projected_balance,
+    weekly_summary,
 )
 from calendar_view import render_range
 from parsers import parse_checks, parse_omd_debt, parse_suppliers_debt
@@ -487,8 +488,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-tab_cal, tab_chart, tab_data, tab_day = st.tabs(
-    ["📅 Calendar", "📈 Balance chart", "🗂 Raw data", "🔍 Daily detail"]
+tab_cal, tab_weekly, tab_chart, tab_data, tab_day = st.tabs(
+    ["📅 Calendar", "📊 Weekly summary", "📈 Balance chart", "🗂 Raw data", "🔍 Daily detail"]
 )
 
 with tab_cal:
@@ -499,6 +500,67 @@ with tab_cal:
     render_range(
         start_date, end_date, ss.current_bank, inflows, outflows, terms_days, ss.safety_buffer
     )
+
+with tab_weekly:
+    st.caption(
+        "Week-by-week roll-up. **Opening** = bank balance at the start of the week. "
+        "**In** / **Out** = receivables / payments landing in that week. "
+        "**Net** = In − Out. **Closing** = projected bank balance at end of week."
+    )
+    ws = weekly_summary(start_date, end_date, ss.current_bank, inflows, outflows)
+    if ws.empty:
+        st.info("No weeks to display.")
+    else:
+        display_df = ws[["week_label", "opening_balance", "in_usd", "out_usd", "net_usd", "closing_balance"]].rename(
+            columns={
+                "week_label": "Week",
+                "opening_balance": "Opening",
+                "in_usd": "↑ In",
+                "out_usd": "↓ Out",
+                "net_usd": "Net",
+                "closing_balance": "Closing",
+            }
+        )
+
+        buffer = ss.safety_buffer
+
+        def _style(row):
+            styles = [""] * len(row)
+            net_idx = row.index.get_loc("Net")
+            close_idx = row.index.get_loc("Closing")
+            open_idx = row.index.get_loc("Opening")
+            if row["Net"] > 0:
+                styles[net_idx] = "color: #0d652d; font-weight: 600"
+            elif row["Net"] < 0:
+                styles[net_idx] = "color: #b71c1c; font-weight: 600"
+            if row["Closing"] < buffer:
+                styles[close_idx] = "color: #b71c1c; font-weight: 600"
+            else:
+                styles[close_idx] = "color: #0d652d; font-weight: 600"
+            if row["Opening"] < buffer:
+                styles[open_idx] = "color: #b71c1c"
+            return styles
+
+        styled = display_df.style.apply(_style, axis=1).format(
+            {
+                "Opening": "${:,.0f}",
+                "↑ In": "${:,.0f}",
+                "↓ Out": "${:,.0f}",
+                "Net": "${:,.0f}",
+                "Closing": "${:,.0f}",
+            }
+        )
+        st.dataframe(styled, use_container_width=True, hide_index=True, height=520)
+
+        below = ws[ws["closing_balance"] < buffer]
+        if not below.empty:
+            first_bad = below.iloc[0]
+            st.warning(
+                f"⚠️ Closing balance below buffer (${buffer:,.0f}) for {len(below)} week(s). "
+                f"First: week of {first_bad['week_label']} → ${first_bad['closing_balance']:,.0f}."
+            )
+        else:
+            st.success("✓ Every week's closing balance stays above the safety buffer.")
 
 with tab_chart:
     series = daily_balance_series(start_date, end_date, ss.current_bank, inflows, outflows)

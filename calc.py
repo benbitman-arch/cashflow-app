@@ -129,6 +129,89 @@ def project_future_sales(
     return pd.DataFrame(rows)
 
 
+def weekly_summary(
+    start: date,
+    end: date,
+    current_bank: float,
+    inflows: pd.DataFrame,
+    outflows: pd.DataFrame,
+) -> pd.DataFrame:
+    """Per-week rollup from `start` through `end`, Sunday-anchored.
+
+    Columns: week_start, week_end, week_label, in_usd, out_usd, net_usd,
+    closing_balance. The first row clips its start to `start` (so partial
+    first weeks are honored); subsequent weeks are full Sun→Sat ranges.
+    Closing balance for week W is projected_balance(W.week_end).
+    """
+    if start > end:
+        return pd.DataFrame()
+
+    rows = []
+    # First week starts at `start`; subsequent weeks at the next Sunday.
+    # Sunday = weekday() 6.
+    cur_start = start
+    while cur_start <= end:
+        # Saturday of cur_start's week
+        days_to_sat = (5 - cur_start.weekday()) % 7  # Mon=0..Sun=6 -> next Sat
+        # weekday(): Mon=0, Sat=5, Sun=6. Days to next Saturday:
+        # Mon(0)->5, Tue(1)->4, Wed(2)->3, Thu(3)->2, Fri(4)->1, Sat(5)->0, Sun(6)->6
+        cur_end = cur_start + timedelta(days=days_to_sat)
+        if cur_end > end:
+            cur_end = end
+
+        if not inflows.empty:
+            in_usd = float(
+                inflows.loc[
+                    (inflows["value_date"] >= cur_start)
+                    & (inflows["value_date"] <= cur_end),
+                    "amount_usd",
+                ].sum()
+            )
+        else:
+            in_usd = 0.0
+        if not outflows.empty:
+            out_usd = float(
+                outflows.loc[
+                    (outflows["due_date"] >= cur_start)
+                    & (outflows["due_date"] <= cur_end),
+                    "amount_usd",
+                ].sum()
+            )
+        else:
+            out_usd = 0.0
+        closing = projected_balance(cur_end, current_bank, inflows, outflows)
+        opening = projected_balance(
+            cur_start - timedelta(days=1), current_bank, inflows, outflows
+        )
+
+        same_day = cur_start == cur_end
+        if same_day:
+            label = cur_start.strftime("%a %b %d")
+        else:
+            label = f"{cur_start.strftime('%a %b %d')} – {cur_end.strftime('%a %b %d')}"
+
+        rows.append(
+            {
+                "week_start": cur_start,
+                "week_end": cur_end,
+                "week_label": label,
+                "opening_balance": opening,
+                "in_usd": in_usd,
+                "out_usd": out_usd,
+                "net_usd": in_usd - out_usd,
+                "closing_balance": closing,
+            }
+        )
+
+        # Advance to the next Sunday after cur_end
+        cur_start = cur_end + timedelta(days=1)
+        # If we landed mid-week (after end), break
+        if cur_start > end:
+            break
+
+    return pd.DataFrame(rows)
+
+
 def daily_balance_series(
     start: date,
     end: date,
