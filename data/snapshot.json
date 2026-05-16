@@ -1,43 +1,8 @@
 {
   "version": 3,
-  "saved_at": "2026-05-14T20:15:33Z",
+  "saved_at": "2026-05-16T11:00:20Z",
   "payments_out_by_source": {
     "checks": [
-      {
-        "source": "checks",
-        "party": "ישי רוזנטל ייצור יהלומים",
-        "amount_usd": 2319.9,
-        "due_date": "2026-05-14",
-        "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "א.ש.לוגנו יהלומים בע\"מ",
-        "amount_usd": 6492.3,
-        "due_date": "2026-05-14",
-        "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "שרין טכנולוגיות ליטוש בע\"מ",
-        "amount_usd": 121.0,
-        "due_date": "2026-05-14",
-        "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "מושל יהלומים בע\"מ",
-        "amount_usd": 3737.25,
-        "due_date": "2026-05-15",
-        "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "אלירן בן דוד יהלומים בע\"מ",
-        "amount_usd": 1743.25,
-        "due_date": "2026-05-15",
-        "info": "מזרחי טפחות"
-      },
       {
         "source": "checks",
         "party": "מושל יהלומים בע\"מ",
@@ -1094,1106 +1059,1106 @@
         "source": "suppliers_debt",
         "party": "Aspeco NY Inc",
         "amount_usd": 1200.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 58351.05,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 11030.88,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 72637.67,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 2132.27,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "PRECIGEMS TRADING FZCO",
         "amount_usd": 143090.48,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "KGS Jewels",
         "amount_usd": 6190.31,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "I.D.J Company",
         "amount_usd": 13105.3,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Aashu Diamonds, Inc.",
         "amount_usd": 8792.64,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "STAR RAYS",
         "amount_usd": 25203.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "Shivam US",
         "amount_usd": 6284.25,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Gleamora inc.",
         "amount_usd": 512.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Mystery Grown Diamonds Inc",
         "amount_usd": 981.48,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "JAS Diamonds, INC",
         "amount_usd": 922.04,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 418.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 585.9,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 210.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 698.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 488.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 800.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 552.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 278.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 393.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 2637.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 1031.25,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 375.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 387.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 1181.15,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 320.85,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 187.2,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 143.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 143.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 228.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 178.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 625.35,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 197.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 320.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 236.9,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 996.15,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 478.95,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 572.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 967.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "Labon Lab Grown Diamonds",
         "amount_usd": 453.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "ANKIT GEMS PVT.LTD",
         "amount_usd": 1116.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "ANKIT GEMS PVT.LTD",
         "amount_usd": 63534.25,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 103108.9,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "Andor Luxury INC.",
         "amount_usd": 298.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 836.55,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 696.78,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 303.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 2466.48,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 511.87,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 593.84,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 767.56,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 854.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 596.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 2053.38,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 586.95,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 181.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 457.17,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "MF BMO Harris Bank"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 1204.24,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 692.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 894.24,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 775.72,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 704.11,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 697.78,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 620.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 322.92,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 908.04,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 577.92,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 226.44,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 1942.76,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 578.74,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 330.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 802.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 715.52,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 625.56,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 765.68,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 1752.28,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 1180.98,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 1584.68,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 2620.97,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "AARUSH  Diam LLC",
         "amount_usd": 2392.63,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 0.01,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "IGC New York Inc.",
         "amount_usd": 874.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "VIRAT DIAMONDS LIMITED",
         "amount_usd": 18707.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "BMO CA $USD"
       },
       {
         "source": "suppliers_debt",
         "party": "Parishi Diamonds",
         "amount_usd": 2072.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Parin Lab Grown USA Inc",
         "amount_usd": 1120.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Belgium Diamond LLC",
         "amount_usd": 22916.25,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Belgium LGD LLC",
         "amount_usd": 400.82,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Lab Grown Diamonds USA LLC",
         "amount_usd": 638.56,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Lab Grown Diamonds USA LLC",
         "amount_usd": 963.48,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Lab Grown Diamonds USA LLC",
         "amount_usd": 261.01,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "OR UNIVERSAL LLC",
         "amount_usd": 349.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 16708.18,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 7109.05,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "IGC New York Inc.",
         "amount_usd": 16720.16,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "DHARM International LLC",
         "amount_usd": 9099.9,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "DHARM International LLC",
         "amount_usd": 5132.46,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 4768.77,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Unique Blue Crystal LLC",
         "amount_usd": 3328.49,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 38710.2,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 69360.75,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 20009.1,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "TD Bank"
       },
       {
         "source": "suppliers_debt",
         "party": "Raiman Rocks Inc.",
         "amount_usd": 25800.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Belgium LGD LLC",
         "amount_usd": 364.01,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 60727.26,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "H.K. International",
         "amount_usd": 37176.9,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "nan"
       },
       {
         "source": "suppliers_debt",
         "party": "H.K. International",
         "amount_usd": 6983.86,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHIVAM JEWELS - IL",
         "amount_usd": 40633.09,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "Ruchi Diamonds",
         "amount_usd": 21868.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "DHARM International LLC",
         "amount_usd": 9100.78,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Parin Lab Grown USA Inc",
         "amount_usd": 614.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Guru Diam",
         "amount_usd": 577.7,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Diagem Inc/ Prismore LLC",
         "amount_usd": 12676.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 22700.61,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 12726.09,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 4698.92,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "יצחק ציונוב יהלומים בע\"מ",
         "amount_usd": 14880.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "מזרחי טפחות"
       },
       {
         "source": "suppliers_debt",
         "party": "Arth Diam Inc",
         "amount_usd": 721.53,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "A. Karmily",
         "amount_usd": 21343.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 35866.68,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 23038.4,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 34178.45,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "SHIVAM JEWELS - IL",
         "amount_usd": 26859.65,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "DV Jewelry Corp",
         "amount_usd": 87.2,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Disons Gems Inc",
         "amount_usd": 38961.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "DHARM International LLC",
         "amount_usd": 111263.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "PALADIYA BROTHERS",
         "amount_usd": 20349.7,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "STAR RAYS",
         "amount_usd": 23264.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "STAR RAYS",
         "amount_usd": 30045.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "LAXMI DIAMOND PRIVATE LIMITED",
         "amount_usd": 34356.19,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "LAXMI DIAMOND PRIVATE LIMITED",
         "amount_usd": 59302.08,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "M.SURESH COMPANY PVT.LTD",
         "amount_usd": 73658.38,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "ANR DIAMONDS INC",
         "amount_usd": 3713.78,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 18856.7,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 71573.58,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Ishtara Diamonds BV",
         "amount_usd": 11869.92,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 7722.13,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "verr bank"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 46931.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 4531.5,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 21895.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 33273.45,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 6956.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "OFER MIZRAHI DIAMOND PVT LTD",
         "amount_usd": 40842.91,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "Ankit Gems Inc",
         "amount_usd": 3063.6,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "Disons Gems Inc",
         "amount_usd": 645.84,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 22846.82,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "VENUS JEWEL",
         "amount_usd": 31432.81,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "Ladd Diamonds",
         "amount_usd": 12100.0,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 10210.57,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 7948.32,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 4288.33,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 12022.8,
-        "due_date": "2026-05-14",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "EMA DIAMONDS LP",
         "amount_usd": 9116.0,
-        "due_date": "2026-05-15",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHUBH DIAM",
         "amount_usd": 52334.35,
-        "due_date": "2026-05-15",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
         "source": "suppliers_debt",
         "party": "SHIVAM JEWELS - IL",
         "amount_usd": 51608.06,
-        "due_date": "2026-05-15",
+        "due_date": "2026-05-16",
         "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "suppliers_debt",
         "party": "Belgium LGD LLC",
         "amount_usd": 2202.0,
-        "due_date": "2026-05-15",
+        "due_date": "2026-05-16",
         "info": "Bank OF America"
       },
       {
@@ -3715,15 +3680,6 @@
     {
       "source": "omd_debt",
       "party": "Barmakian Jewelers Nashua",
-      "amount_usd": 105.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-05-01",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Barmakian Jewelers Nashua",
       "amount_usd": 35.0,
       "value_date": "2026-05-23",
       "reference_date": "2026-04-23",
@@ -3922,15 +3878,6 @@
     {
       "source": "omd_debt",
       "party": "Bertucci Jewellers ($CAD)",
-      "amount_usd": 976.57,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Bertucci Jewellers ($CAD)",
       "amount_usd": 2184.3,
       "value_date": "2026-06-04",
       "reference_date": "2026-05-05",
@@ -4016,15 +3963,6 @@
       "value_date": "2026-05-22",
       "reference_date": "2026-04-22",
       "original_value_date": "2026-05-22",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Britton Diamonds ($CAD)",
-      "amount_usd": 18838.69,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
       "info": ""
     },
     {
@@ -4904,15 +4842,6 @@
       "source": "omd_debt",
       "party": "Engaged Diamond Studio Ltd (USD)",
       "amount_usd": 20.0,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Engaged Diamond Studio Ltd (USD)",
-      "amount_usd": 20.0,
       "value_date": "2026-06-03",
       "reference_date": "2026-05-04",
       "original_value_date": "2026-06-03",
@@ -5380,15 +5309,6 @@
     {
       "source": "omd_debt",
       "party": "Independent Jewellers",
-      "amount_usd": 410.56,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Independent Jewellers",
       "amount_usd": 556.43,
       "value_date": "2026-05-16",
       "reference_date": "2026-04-16",
@@ -5614,15 +5534,6 @@
     {
       "source": "omd_debt",
       "party": "Jewelers Trade Shop",
-      "amount_usd": 24100.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Jewelers Trade Shop",
       "amount_usd": 5896.8,
       "value_date": "2026-05-20",
       "reference_date": "2026-04-20",
@@ -5672,24 +5583,6 @@
       "value_date": "2026-05-30",
       "reference_date": "2026-04-30",
       "original_value_date": "2026-05-30",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Jewelry Design Center",
-      "amount_usd": 35.0,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-30",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Jewelry Design Center",
-      "amount_usd": 35.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-05-01",
-      "original_value_date": "2026-05-15",
       "info": ""
     },
     {
@@ -6837,15 +6730,6 @@
     },
     {
       "source": "omd_debt",
-      "party": "Mouradian Jewelry",
-      "amount_usd": 2301.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-03-16",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
       "party": "Nader Kash Intl",
       "amount_usd": 1894.86,
       "value_date": "2026-05-25",
@@ -6887,24 +6771,6 @@
       "value_date": "2026-06-12",
       "reference_date": "2026-05-13",
       "original_value_date": "2026-06-12",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Nivoda USA LLC",
-      "amount_usd": 1323.39,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-30",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Nivoda USA LLC",
-      "amount_usd": 0.01,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-30",
-      "original_value_date": "2026-05-14",
       "info": ""
     },
     {
@@ -7202,60 +7068,6 @@
       "value_date": "2026-05-22",
       "reference_date": "2026-04-22",
       "original_value_date": "2026-05-22",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 1250.0,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 3953.38,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 8898.44,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 14700.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 35.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-05-01",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "RJO Inc,",
-      "amount_usd": 70.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-05-01",
-      "original_value_date": "2026-05-15",
       "info": ""
     },
     {
@@ -8782,24 +8594,6 @@
     {
       "source": "omd_debt",
       "party": "Swanson's Jewellers",
-      "amount_usd": 6981.54,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Swanson's Jewellers",
-      "amount_usd": 25.0,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Swanson's Jewellers",
       "amount_usd": 20.0,
       "value_date": "2026-05-31",
       "reference_date": "2026-05-01",
@@ -8935,15 +8729,6 @@
     {
       "source": "omd_debt",
       "party": "Tivol",
-      "amount_usd": 9444.0,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Tivol",
       "amount_usd": 3500.0,
       "value_date": "2026-06-11",
       "reference_date": "2026-05-12",
@@ -9047,24 +8832,6 @@
       "value_date": "2026-06-26",
       "reference_date": "2026-05-12",
       "original_value_date": "2026-06-26",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Touch of Gold ($CAD)",
-      "amount_usd": 4282.9,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Touch of Gold ($CAD)",
-      "amount_usd": 22275.77,
-      "value_date": "2026-05-15",
-      "reference_date": "2026-04-15",
-      "original_value_date": "2026-05-15",
       "info": ""
     },
     {
@@ -9218,15 +8985,6 @@
       "value_date": "2026-06-11",
       "reference_date": "2026-05-12",
       "original_value_date": "2026-06-11",
-      "info": ""
-    },
-    {
-      "source": "omd_debt",
-      "party": "Vancouver Diamonds",
-      "amount_usd": 4590.87,
-      "value_date": "2026-05-14",
-      "reference_date": "2026-04-14",
-      "original_value_date": "2026-05-14",
       "info": ""
     },
     {
@@ -9486,6 +9244,13 @@
     },
     {
       "reason": "overdue (excluded from projection)",
+      "name": "Barmakian Jewelers Nashua",
+      "amount": 105.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-05-01"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
       "name": "Baxter's Fine Jewelry",
       "amount": 75.0,
       "value_date": "2026-05-01",
@@ -9549,6 +9314,13 @@
     },
     {
       "reason": "overdue (excluded from projection)",
+      "name": "Bertucci Jewellers ($CAD)",
+      "amount": 976.57,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
       "name": "Bolenz Jewelry",
       "amount": 2435.0,
       "value_date": "2026-05-07",
@@ -9567,6 +9339,13 @@
       "amount": 3574.2,
       "value_date": "2026-04-30",
       "reference_date": "2026-03-31"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Britton Diamonds ($CAD)",
+      "amount": 18838.69,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
     },
     {
       "reason": "yellow exclude list",
@@ -9728,6 +9507,13 @@
       "amount": 50.0,
       "value_date": "2026-05-09",
       "reference_date": "2026-04-09"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Engaged Diamond Studio Ltd (USD)",
+      "amount": 20.0,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
     },
     {
       "reason": "overdue (excluded from projection)",
@@ -10256,6 +10042,13 @@
     },
     {
       "reason": "overdue (excluded from projection)",
+      "name": "Independent Jewellers",
+      "amount": 410.56,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
       "name": "Inglis Jewellers Inc.",
       "amount": 25.0,
       "value_date": "2025-09-19",
@@ -10309,6 +10102,27 @@
       "amount": 41106.0,
       "value_date": "2026-05-10",
       "reference_date": "2026-04-10"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Jewelers Trade Shop",
+      "amount": 24100.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Jewelry Design Center",
+      "amount": 35.0,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-30"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Jewelry Design Center",
+      "amount": 35.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-05-01"
     },
     {
       "reason": "overdue (excluded from projection)",
@@ -10550,6 +10364,13 @@
     },
     {
       "reason": "overdue (excluded from projection)",
+      "name": "Mouradian Jewelry",
+      "amount": 2301.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-03-16"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
       "name": "MR Diamonds",
       "amount": 1620.0,
       "value_date": "2026-02-14",
@@ -10582,6 +10403,20 @@
       "amount": 24829.78,
       "value_date": "2026-05-05",
       "reference_date": "2026-04-21"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Nivoda USA LLC",
+      "amount": 1323.39,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-30"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Nivoda USA LLC",
+      "amount": 0.01,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-30"
     },
     {
       "reason": "yellow exclude list",
@@ -11795,6 +11630,48 @@
       "reference_date": "2026-04-29"
     },
     {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 1250.0,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 3953.38,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 8898.44,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 14700.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 35.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-05-01"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "RJO Inc,",
+      "amount": 70.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-05-01"
+    },
+    {
       "reason": "yellow exclude list",
       "name": "Rockwell House dba Frank Darling",
       "amount": 12372.03,
@@ -12188,10 +12065,31 @@
     },
     {
       "reason": "overdue (excluded from projection)",
+      "name": "Swanson's Jewellers",
+      "amount": 6981.54,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Swanson's Jewellers",
+      "amount": 25.0,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
       "name": "The Perfect Gift",
       "amount": 0.01,
       "value_date": "2026-04-24",
       "reference_date": "2026-03-25"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Tivol",
+      "amount": 9444.0,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
     },
     {
       "reason": "overdue (excluded from projection)",
@@ -12220,6 +12118,20 @@
       "amount": 31895.03,
       "value_date": "2026-05-10",
       "reference_date": "2026-04-10"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Touch of Gold ($CAD)",
+      "amount": 4282.9,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Touch of Gold ($CAD)",
+      "amount": 22275.77,
+      "value_date": "2026-05-15",
+      "reference_date": "2026-04-15"
     },
     {
       "reason": "overdue (excluded from projection)",
@@ -12283,6 +12195,13 @@
       "amount": 7179.0,
       "value_date": "2021-01-31",
       "reference_date": null
+    },
+    {
+      "reason": "overdue (excluded from projection)",
+      "name": "Vancouver Diamonds",
+      "amount": 4590.87,
+      "value_date": "2026-05-14",
+      "reference_date": "2026-04-14"
     },
     {
       "reason": "overdue (excluded from projection)",
