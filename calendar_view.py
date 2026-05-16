@@ -8,7 +8,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from calc import max_buy
+from calc import max_buy, projected_balance
 
 _CSS = """
 <style>
@@ -131,8 +131,10 @@ def _cell_html(
 def _week_summary_html(
     week_start: date,
     week_end: date,
+    current_bank: float,
     inflows: pd.DataFrame,
     outflows: pd.DataFrame,
+    safety_buffer: float = 0.0,
 ) -> str:
     out_w = (
         float(
@@ -155,8 +157,11 @@ def _week_summary_html(
         else 0.0
     )
     net_w = in_w - out_w
+    closing = projected_balance(week_end, current_bank, inflows, outflows)
     net_class = "in" if net_w >= 0 else "out"
     net_sign = "+" if net_w >= 0 else "−"
+    closing_class = "in" if closing >= safety_buffer else "out"
+    closing_sign = "" if closing >= 0 else "−"
     label = f"Week of {week_start.strftime('%b %d')}"
     return (
         f"<div class='cf-week-summary'>"
@@ -164,6 +169,7 @@ def _week_summary_html(
         f"<span class='out'>↓ Pay: {_fmt_money(out_w)}</span>"
         f"<span class='in'>↑ Receive: {_fmt_money(in_w)}</span>"
         f"<span class='{net_class}'>Net: {net_sign}{_fmt_money(abs(net_w))}</span>"
+        f"<span class='{closing_class}'>Closing: {closing_sign}{_fmt_money(abs(closing))}</span>"
         f"</div>"
     )
 
@@ -211,7 +217,14 @@ def render_month(
             )
         grid_html = "<div class='cf-grid'>" + "".join(cells) + "</div>"
         if week_dates:
-            summary = _week_summary_html(min(week_dates), max(week_dates), inflows, outflows)
+            summary = _week_summary_html(
+                min(week_dates),
+                max(week_dates),
+                current_bank,
+                inflows,
+                outflows,
+                safety_buffer,
+            )
         else:
             summary = ""
         st.markdown(grid_html + summary, unsafe_allow_html=True)
