@@ -392,6 +392,7 @@ if outflows.empty and inflows.empty:
 # summary cards
 total_in = float(inflows["amount_usd"].sum()) if not inflows.empty else 0.0
 if not existing_inflows.empty and "is_overdue" in existing_inflows.columns:
+    # New snapshot format: overdue is flagged inside payments_in itself
     real_in_overdue = float(
         existing_inflows.loc[existing_inflows["is_overdue"], "amount_usd"].sum()
     )
@@ -399,10 +400,20 @@ if not existing_inflows.empty and "is_overdue" in existing_inflows.columns:
         existing_inflows.loc[~existing_inflows["is_overdue"], "amount_usd"].sum()
     )
 else:
+    # Old snapshot format: overdue was split into excluded_omd
     real_in_ontime = (
         float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
     )
-    real_in_overdue = 0.0
+    real_in_overdue = (
+        float(
+            ss.excluded_omd.loc[
+                ss.excluded_omd["reason"] == "overdue (excluded from projection)",
+                "amount",
+            ].sum()
+        )
+        if not ss.excluded_omd.empty and "reason" in ss.excluded_omd.columns
+        else 0.0
+    )
 real_in = real_in_ontime + real_in_overdue
 projected_in = (
     (float(projected["amount_usd"].sum()) if not projected.empty else 0.0)
