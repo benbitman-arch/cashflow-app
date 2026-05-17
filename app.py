@@ -359,20 +359,22 @@ with st.sidebar:
     st.divider()
     st.header("Customer payment plans")
     st.caption(
-        "Override a customer's OMD invoices with a monthly schedule. "
-        "Example: customer owes $600K → $60K/mo × 10 mo. The calendar and "
-        "all calculations adjust accordingly."
+        "Spread a customer's **overdue** balance into a monthly schedule. "
+        "On-time invoices stay on their original OMD value dates — only the "
+        "overdue portion is replaced by the plan."
     )
 
     # List existing plans
     if ss.payment_plans:
         for i, p in enumerate(ss.payment_plans):
             cols = st.columns([7, 1])
+            plan_total = float(p['monthly_amount']) * int(p['months'])
             cols[0].markdown(
                 f"**{p['customer']}**  \n"
                 f"<span style='font-size:12px;color:#666'>"
                 f"${float(p['monthly_amount']):,.0f}/mo × {int(p['months'])} mo "
-                f"from {p['start_date']} = ${float(p['monthly_amount']) * int(p['months']):,.0f}</span>",
+                f"from {p['start_date']} = ${plan_total:,.0f} "
+                f"<i>(replaces overdue)</i></span>",
                 unsafe_allow_html=True,
             )
             if cols[1].button("✕", key=f"_remove_plan_{i}", help="Remove this plan"):
@@ -464,6 +466,33 @@ with st.sidebar:
             st.session_state.setdefault("_plan_monthly_str", "0")
             st.session_state.setdefault("_plan_months", 10)
 
+            # Plan basis = overdue portion only. User can override.
+            st.session_state.setdefault(
+                "_plan_amount_str", f"{overdue_amt_c:,.0f}"
+            )
+            # Re-default the plan amount when the customer changes
+            if st.session_state.get("_plan_amount_for") != sel_customer:
+                st.session_state["_plan_amount_str"] = f"{overdue_amt_c:,.0f}"
+                st.session_state["_plan_amount_for"] = sel_customer
+
+            plan_amount_str = st.text_input(
+                "Plan amount (USD)  — overdue to spread",
+                key="_plan_amount_str",
+                help="Defaults to this customer's overdue total. Edit if you want to spread a different amount.",
+            )
+            try:
+                plan_amount_val = float(
+                    str(plan_amount_str)
+                    .replace(",", "")
+                    .replace(" ", "")
+                    .replace("$", "")
+                )
+            except ValueError:
+                plan_amount_val = 0.0
+
+            st.session_state.setdefault("_plan_monthly_str", "0")
+            st.session_state.setdefault("_plan_months", 10)
+
             col_a, col_b = st.columns(2)
             monthly_str = col_a.text_input(
                 "Monthly amount (USD)", key="_plan_monthly_str"
@@ -495,28 +524,30 @@ with st.sidebar:
                 if months is not None:
                     st.session_state["_plan_months"] = months
 
-            if sel_owes > 0:
-                st.caption("Quick fill:")
+            basis = plan_amount_val if plan_amount_val > 0 else overdue_amt_c
+
+            if basis > 0:
+                st.caption(f"Quick fill (spreads ${basis:,.0f}):")
                 st.button(
                     f"Split equally over {int(months_input)} months  →  "
-                    f"${sel_owes / int(months_input):,.0f}/mo",
+                    f"${basis / int(months_input):,.0f}/mo",
                     key="_sg_split",
                     on_click=_apply_shortcut,
-                    args=(sel_owes / int(months_input),),
+                    args=(basis / int(months_input),),
                     use_container_width=True,
                 )
                 st.button(
-                    f"Pay in full over 6 months  →  ${sel_owes / 6:,.0f}/mo",
+                    f"Pay over 6 months  →  ${basis / 6:,.0f}/mo",
                     key="_sg_6",
                     on_click=_apply_shortcut,
-                    args=(sel_owes / 6, 6),
+                    args=(basis / 6, 6),
                     use_container_width=True,
                 )
                 st.button(
-                    f"Pay in full over 12 months  →  ${sel_owes / 12:,.0f}/mo",
+                    f"Pay over 12 months  →  ${basis / 12:,.0f}/mo",
                     key="_sg_12",
                     on_click=_apply_shortcut,
-                    args=(sel_owes / 12, 12),
+                    args=(basis / 12, 12),
                     use_container_width=True,
                 )
 
@@ -524,11 +555,11 @@ with st.sidebar:
                 if monthly_val > 0:
                     import math
 
-                    auto_months = max(1, min(120, math.ceil(sel_owes / monthly_val)))
-                    last_pay = monthly_val * auto_months - sel_owes
+                    auto_months = max(1, min(120, math.ceil(basis / monthly_val)))
+                    last_overshoot = monthly_val * auto_months - basis
                     last_note = (
-                        f" (last payment ${monthly_val - last_pay:,.0f})"
-                        if abs(last_pay) > 0.5
+                        f" (last payment ${monthly_val - last_overshoot:,.0f})"
+                        if abs(last_overshoot) > 0.5
                         else ""
                     )
                     st.button(
@@ -540,16 +571,15 @@ with st.sidebar:
                     )
 
             plan_total = monthly_val * int(months_input)
-            if monthly_val > 0:
-                diff = plan_total - sel_owes
-                # treat <$1 as exact match (display rounds to whole dollars anyway)
+            if monthly_val > 0 and basis > 0:
+                diff = plan_total - basis
                 if abs(diff) < 1.0:
                     st.success(
-                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding."
+                        f"✓ Plan total ${plan_total:,.0f} covers the spread amount."
                     )
                 else:
                     st.info(
-                        f"Plan total: ${plan_total:,.0f}  |  Owed: ${sel_owes:,.0f}  "
+                        f"Plan total: ${plan_total:,.0f}  |  Spread amount: ${basis:,.0f}  "
                         f"|  Δ ${diff:+,.0f}"
                     )
 
@@ -563,6 +593,7 @@ with st.sidebar:
                             "monthly_amount": monthly_val,
                             "months": int(months_input),
                             "start_date": start_input.isoformat(),
+                            "plan_amount": plan_amount_val,
                         }
                     )
                     st.rerun()

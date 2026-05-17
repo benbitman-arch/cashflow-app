@@ -79,23 +79,33 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
 def apply_payment_plans(
     payments_in: pd.DataFrame, plans: list[dict]
 ) -> pd.DataFrame:
-    """Override a customer's OMD entries with a monthly payment schedule.
+    """Override a customer's OVERDUE invoices with a monthly payment schedule.
 
-    For every plan {customer, monthly_amount, months, start_date}:
-      1. Remove every row from payments_in where party == customer
-      2. Generate `months` synthetic rows, $monthly_amount each, on consecutive
-         monthly dates starting at start_date (using calendar months, not 30 days)
+    For every plan {customer, monthly_amount, months, start_date, ...}:
+      1. Drop only the OVERDUE rows for that customer from payments_in
+         (rows where is_overdue == True). On-time rows are left untouched and
+         continue to use their original OMD value_date.
+      2. Generate `months` synthetic rows of $monthly_amount on consecutive
+         calendar-month dates starting at start_date.
 
     Returns a new DataFrame; payments_in is not mutated.
     """
-    if not plans or payments_in is None or payments_in.empty:
-        if plans and (payments_in is None or payments_in.empty):
-            # No OMD yet, still emit the plan rows so projection has something
-            return _plans_to_df(plans)
+    if not plans:
         return payments_in if payments_in is not None else pd.DataFrame()
+    if payments_in is None or payments_in.empty:
+        return _plans_to_df(plans)
 
-    plan_customers = {p["customer"] for p in plans}
-    base = payments_in[~payments_in["party"].isin(plan_customers)].copy()
+    df = payments_in.copy()
+    if "is_overdue" in df.columns:
+        # Drop only this plan-customer's overdue rows
+        plan_customers = {p["customer"] for p in plans}
+        drop_mask = df["party"].isin(plan_customers) & df["is_overdue"].astype(bool)
+        base = df[~drop_mask].copy()
+    else:
+        # Backward-compat snapshot without is_overdue: drop ALL of that customer's rows
+        plan_customers = {p["customer"] for p in plans}
+        base = df[~df["party"].isin(plan_customers)].copy()
+
     synth = _plans_to_df(plans)
     if synth.empty:
         return base
