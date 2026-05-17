@@ -459,15 +459,19 @@ with st.sidebar:
                 unsafe_allow_html=True,
             )
 
+            # Initialize session state defaults once; widgets read from there
+            # so on_click callbacks can mutate before the next rerun.
+            st.session_state.setdefault("_plan_monthly_str", "0")
+            st.session_state.setdefault("_plan_months", 10)
+
             col_a, col_b = st.columns(2)
             monthly_str = col_a.text_input(
-                "Monthly amount (USD)", value="0", key="_plan_monthly_str"
+                "Monthly amount (USD)", key="_plan_monthly_str"
             )
             months_input = col_b.number_input(
                 "Number of months",
                 min_value=1,
                 max_value=120,
-                value=10,
                 step=1,
                 key="_plan_months",
             )
@@ -484,20 +488,33 @@ with st.sidebar:
             except ValueError:
                 monthly_val = 0.0
 
-            # Suggestion shortcuts
+            # Suggestion shortcuts — must use on_click callbacks so session_state
+            # updates run BEFORE widgets re-instantiate on the next rerun.
+            def _apply_shortcut(amount: float, months: int | None = None) -> None:
+                st.session_state["_plan_monthly_str"] = f"{amount:,.0f}"
+                if months is not None:
+                    st.session_state["_plan_months"] = months
+
             if sel_owes > 0:
                 sg1, sg2, sg3 = st.columns(3)
-                if sg1.button(f"Split equally → ${sel_owes / int(months_input):,.0f}/mo", key="_sg_split"):
-                    st.session_state["_plan_monthly_str"] = f"{sel_owes / int(months_input):,.0f}"
-                    st.rerun()
-                if sg2.button(f"Full in 6mo → ${sel_owes / 6:,.0f}/mo", key="_sg_6"):
-                    st.session_state["_plan_monthly_str"] = f"{sel_owes / 6:,.0f}"
-                    st.session_state["_plan_months"] = 6
-                    st.rerun()
-                if sg3.button(f"Full in 12mo → ${sel_owes / 12:,.0f}/mo", key="_sg_12"):
-                    st.session_state["_plan_monthly_str"] = f"{sel_owes / 12:,.0f}"
-                    st.session_state["_plan_months"] = 12
-                    st.rerun()
+                sg1.button(
+                    f"Split equally → ${sel_owes / int(months_input):,.0f}/mo",
+                    key="_sg_split",
+                    on_click=_apply_shortcut,
+                    args=(sel_owes / int(months_input),),
+                )
+                sg2.button(
+                    f"Full in 6mo → ${sel_owes / 6:,.0f}/mo",
+                    key="_sg_6",
+                    on_click=_apply_shortcut,
+                    args=(sel_owes / 6, 6),
+                )
+                sg3.button(
+                    f"Full in 12mo → ${sel_owes / 12:,.0f}/mo",
+                    key="_sg_12",
+                    on_click=_apply_shortcut,
+                    args=(sel_owes / 12, 12),
+                )
 
             plan_total = monthly_val * int(months_input)
             if monthly_val > 0:
