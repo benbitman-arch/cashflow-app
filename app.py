@@ -391,6 +391,11 @@ if outflows.empty and inflows.empty:
 
 # summary cards
 total_in = float(inflows["amount_usd"].sum()) if not inflows.empty else 0.0
+real_in = float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
+projected_in = (
+    (float(projected["amount_usd"].sum()) if not projected.empty else 0.0)
+    + (float(fm_deposits["amount_usd"].sum()) if not fm_deposits.empty else 0.0)
+)
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
 overdue_amt = (
     float(outflows.loc[outflows["due_date"] <= today, "amount_usd"].sum())
@@ -408,7 +413,7 @@ overdue_receivables_amt = (
 cash_now = ss.current_bank - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
-c1, c2, c3, c4, c5 = st.columns(5)
+c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric("Current bank", f"${ss.current_bank:,.0f}")
 
 # Custom 'Cash now' metric so we can color the value red when negative
@@ -436,8 +441,20 @@ c3.markdown(
     unsafe_allow_html=True,
 )
 
-c4.metric("Receivables outstanding", f"${total_in:,.0f}")
-c5.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
+c4.metric(
+    "Real receivables",
+    f"${real_in:,.0f}",
+    help="Outstanding customer invoices from the OMD file (on-time only — overdue customers excluded from projection).",
+)
+c5.metric(
+    "Projected receivables",
+    f"${projected_in:,.0f}",
+    help=(
+        f"Synthetic future income over the next {horizon} days: weekly projected sales × {horizon // 7} weeks "
+        "+ FM Trading weekly deposits."
+    ),
+)
+c6.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 
 if overdue_amt > 0 and cash_now < 0:
     st.error(
