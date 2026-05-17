@@ -191,6 +191,32 @@ def project_fm_deposits(start: date, end: date, weekly_amount: float) -> pd.Data
     return pd.DataFrame(rows)
 
 
+def project_weekly_expenses(start: date, end: date, weekly_amount: float) -> pd.DataFrame:
+    """Generate synthetic weekly OUTFLOWS for recurring company expenses.
+
+    Used for ongoing costs like salaries / office expenses that hit the bank
+    weekly. First expense is one week from `start`; same cadence as FM. The
+    output schema mirrors the outflows DataFrame (source/party/amount_usd/
+    due_date/info) so it can be concatenated with checks + suppliers debt.
+    """
+    if weekly_amount <= 0:
+        return pd.DataFrame()
+    rows = []
+    d = start + timedelta(days=7)
+    while d <= end:
+        rows.append(
+            {
+                "source": "weekly_expenses",
+                "party": f"Company expenses ({d.isoformat()})",
+                "amount_usd": float(weekly_amount),
+                "due_date": d,
+                "info": "weekly expenses",
+            }
+        )
+        d += timedelta(days=7)
+    return pd.DataFrame(rows)
+
+
 def project_future_sales(
     start: date,
     end: date,

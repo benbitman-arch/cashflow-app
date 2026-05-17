@@ -19,6 +19,7 @@ from calc import (
     max_buy,
     project_fm_deposits,
     project_future_sales,
+    project_weekly_expenses,
     projected_balance,
     weekly_summary,
 )
@@ -147,6 +148,7 @@ ss.setdefault("weekly_sales", 0.0)
 ss.setdefault("customer_terms_days", 30)
 ss.setdefault("fm_trading_weekly", 0.0)
 ss.setdefault("customer_payment_delay_days", 0)
+ss.setdefault("weekly_expenses", 0.0)
 ss.setdefault("payment_plans", [])
 ss.setdefault("snapshot_saved_at", None)
 ss.setdefault("last_saved_settings", None)
@@ -172,6 +174,8 @@ if not ss.loaded:
             ss.fm_trading_weekly = float(parsed["fm_trading_weekly"])
         if parsed.get("customer_payment_delay_days") is not None:
             ss.customer_payment_delay_days = int(parsed["customer_payment_delay_days"])
+        if parsed.get("weekly_expenses") is not None:
+            ss.weekly_expenses = float(parsed["weekly_expenses"])
         if parsed.get("payment_plans"):
             ss.payment_plans = list(parsed["payment_plans"])
         ss.snapshot_saved_at = parsed.get("saved_at")
@@ -199,6 +203,7 @@ if not ss.loaded:
         ss.customer_terms_days,
         ss.customer_payment_delay_days,
         ss.fm_trading_weekly,
+        ss.weekly_expenses,
         _plans_signature(ss.payment_plans),
     )
     ss.loaded = True
@@ -232,6 +237,7 @@ def _push_snapshot(reason: str) -> None:
         fm_trading_weekly=ss.fm_trading_weekly,
         payment_plans=ss.payment_plans,
         customer_payment_delay_days=ss.customer_payment_delay_days,
+        weekly_expenses=ss.weekly_expenses,
     )
     ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
     if ok:
@@ -340,6 +346,17 @@ with st.sidebar:
             help="FM Trading deposits weekly into the Israel bank. Added directly to inflows (no terms delay).",
         )
 
+        st.markdown("##### 💸 Weekly company expenses")
+        weekly_exp_str = st.text_input(
+            "Weekly expenses (USD)",
+            value=f"{ss.weekly_expenses:,.0f}",
+            help=(
+                "Recurring weekly costs going OUT of the company — employee salaries, "
+                "office expenses, etc. Generates a synthetic outflow every 7 days starting "
+                "next week."
+            ),
+        )
+
         submitted = st.form_submit_button(
             "✅ Apply", use_container_width=True, type="primary"
         )
@@ -358,6 +375,7 @@ with st.sidebar:
             0, min(180, _parse_int(late_str, ss.customer_payment_delay_days))
         )
         ss.fm_trading_weekly = _parse_money(fm_weekly_str, ss.fm_trading_weekly)
+        ss.weekly_expenses = _parse_money(weekly_exp_str, ss.weekly_expenses)
 
     try:
         terms_days = [int(x.strip()) for x in ss.terms_days_str.split(",") if x.strip()]
@@ -380,6 +398,7 @@ with st.sidebar:
         ss.customer_terms_days,
         ss.customer_payment_delay_days,
         ss.fm_trading_weekly,
+        ss.weekly_expenses,
         plans_sig,
     )
     if ss.last_saved_settings != current_settings:
@@ -714,7 +733,10 @@ projected = project_future_sales(today, end_date, ss.weekly_sales, ss.customer_t
 fm_deposits = project_fm_deposits(today, end_date, ss.fm_trading_weekly)
 inflow_parts = [df for df in [existing_inflows, projected, fm_deposits] if not df.empty]
 inflows = pd.concat(inflow_parts, ignore_index=True) if inflow_parts else pd.DataFrame()
-outflows = _outflows()
+_base_outflows = _outflows()
+_weekly_exp_df = project_weekly_expenses(today, end_date, ss.weekly_expenses)
+outflow_parts = [df for df in [_base_outflows, _weekly_exp_df] if not df.empty]
+outflows = pd.concat(outflow_parts, ignore_index=True) if outflow_parts else pd.DataFrame()
 
 if outflows.empty and inflows.empty:
     st.markdown(
