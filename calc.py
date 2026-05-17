@@ -79,26 +79,47 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
 def apply_customer_payment_delay(
     payments_in: pd.DataFrame, delay_days: int
 ) -> pd.DataFrame:
-    """Shift OMD invoice value_dates by `delay_days` to model typical late payment.
+    """Shift each OMD invoice by `delay_days` from its ORIGINAL value_date.
 
-    Customers often pay several days after the invoice value_date. This shifts
-    every OMD row's value_date forward by the given number of days. It does
-    NOT touch synthetic sources (projected_sales, fm_trading, payment_plan).
-    The projected_sales generator already uses customer_terms_days, which is
-    derived from historical OMD data and already reflects average lateness.
+    Customers pay several days after their invoice's original value_date. We
+    shift from the original (pre-clamp) date, then clamp to today so an
+    invoice that was due 30 days ago doesn't end up 23 days in the past — it
+    arrives today (this week). An invoice due 3 days ago shifts to today+4d.
+    An invoice due in the future shifts forward `delay_days`.
+
+    Does NOT touch projected_sales (its customer_terms_days already bakes in
+    average lateness), fm_trading deposits, or payment_plan rows.
     """
     if delay_days == 0 or payments_in is None or payments_in.empty:
         return payments_in if payments_in is not None else pd.DataFrame()
     if "source" not in payments_in.columns or "value_date" not in payments_in.columns:
         return payments_in
+
     df = payments_in.copy()
     mask = df["source"] == "omd_debt"
     if not mask.any():
         return df
+
+    today = date.today()
     delta = timedelta(days=int(delay_days))
-    df.loc[mask, "value_date"] = df.loc[mask, "value_date"].apply(
-        lambda d: (d + delta) if d is not None and not pd.isna(d) else d
-    )
+    has_orig = "original_value_date" in df.columns
+
+    def _shift_row(row):
+        base = None
+        if has_orig:
+            base = row.get("original_value_date")
+            if base is None or (isinstance(base, float) and pd.isna(base)):
+                base = None
+        if base is None:
+            base = row["value_date"]
+        if base is None or (isinstance(base, float) and pd.isna(base)):
+            return row["value_date"]
+        new_date = base + delta
+        if new_date < today:
+            new_date = today
+        return new_date
+
+    df.loc[mask, "value_date"] = df.loc[mask].apply(_shift_row, axis=1)
     return df
 
 
