@@ -787,10 +787,13 @@ projected_in = (
     + (float(fm_deposits["amount_usd"].sum()) if not fm_deposits.empty else 0.0)
 )
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
-# Total debts = only real obligations from the Excel files (checks + suppliers debt),
-# excluding the synthetic recurring weekly expenses.
+# Split total debts: real obligations (checks + supplier debt) vs synthetic
+# recurring weekly expenses (salaries, office). Show full total + breakdown.
 total_debts_real = (
     float(_base_outflows["amount_usd"].sum()) if not _base_outflows.empty else 0.0
+)
+total_debts_weekly = (
+    float(_weekly_exp_df["amount_usd"].sum()) if not _weekly_exp_df.empty else 0.0
 )
 overdue_amt = (
     float(outflows.loc[outflows["due_date"] <= today, "amount_usd"].sum())
@@ -844,12 +847,16 @@ _card(
     color=cash_color,
 )
 
-# Total debts (real obligations only — excludes synthetic weekly expenses)
+# Total debts = real obligations + projected weekly expenses, with breakdown.
 _card(
     c3,
     "Total debts",
-    _short_money(total_debts_real),
-    sub="checks + supplier debt",
+    _short_money(total_debts_real + total_debts_weekly),
+    sub=(
+        f"↓ incl. {_short_money(total_debts_weekly)} weekly expenses"
+        if total_debts_weekly > 0
+        else "checks + supplier debt"
+    ),
     color="#b71c1c",
 )
 
