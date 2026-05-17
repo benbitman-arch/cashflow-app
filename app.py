@@ -496,24 +496,28 @@ with st.sidebar:
                     st.session_state["_plan_months"] = months
 
             if sel_owes > 0:
-                sg1, sg2, sg3 = st.columns(3)
-                sg1.button(
-                    f"Split equally → ${sel_owes / int(months_input):,.0f}/mo",
+                st.caption("Quick fill:")
+                st.button(
+                    f"Split equally over {int(months_input)} months  →  "
+                    f"${sel_owes / int(months_input):,.0f}/mo",
                     key="_sg_split",
                     on_click=_apply_shortcut,
                     args=(sel_owes / int(months_input),),
+                    use_container_width=True,
                 )
-                sg2.button(
-                    f"Full in 6mo → ${sel_owes / 6:,.0f}/mo",
+                st.button(
+                    f"Pay in full over 6 months  →  ${sel_owes / 6:,.0f}/mo",
                     key="_sg_6",
                     on_click=_apply_shortcut,
                     args=(sel_owes / 6, 6),
+                    use_container_width=True,
                 )
-                sg3.button(
-                    f"Full in 12mo → ${sel_owes / 12:,.0f}/mo",
+                st.button(
+                    f"Pay in full over 12 months  →  ${sel_owes / 12:,.0f}/mo",
                     key="_sg_12",
                     on_click=_apply_shortcut,
                     args=(sel_owes / 12, 12),
+                    use_container_width=True,
                 )
 
             plan_total = monthly_val * int(months_input)
