@@ -394,24 +394,70 @@ with st.sidebar:
         if not all_customers:
             st.warning("Upload OMD file first to see your customer list.")
         else:
-            # Show how much each customer currently owes for context
-            owed_by_customer = (
-                ss.payments_in.groupby("party")["amount_usd"].sum().to_dict()
-                if not ss.payments_in.empty
-                else {}
-            )
-            options = [
-                f"{c}  —  owes ${owed_by_customer.get(c, 0):,.0f}"
-                for c in all_customers
-            ]
-            sel_idx = st.selectbox(
+            sel_customer = st.selectbox(
                 "Customer (type to search)",
-                options=range(len(options)),
-                format_func=lambda i: options[i],
-                key="_plan_customer_idx",
+                options=all_customers,
+                key="_plan_customer",
             )
-            sel_customer = all_customers[sel_idx]
-            sel_owes = owed_by_customer.get(sel_customer, 0)
+
+            # Build the per-customer breakdown panel
+            cust_rows = ss.payments_in[ss.payments_in["party"] == sel_customer]
+            sel_owes = float(cust_rows["amount_usd"].sum()) if not cust_rows.empty else 0.0
+            n_invoices = len(cust_rows)
+            if "is_overdue" in cust_rows.columns and not cust_rows.empty:
+                overdue_amt_c = float(
+                    cust_rows.loc[cust_rows["is_overdue"], "amount_usd"].sum()
+                )
+                ontime_amt_c = float(
+                    cust_rows.loc[~cust_rows["is_overdue"], "amount_usd"].sum()
+                )
+            else:
+                overdue_amt_c = 0.0
+                ontime_amt_c = sel_owes
+
+            date_col = (
+                "original_value_date"
+                if "original_value_date" in cust_rows.columns
+                else "value_date"
+            )
+            if not cust_rows.empty and date_col in cust_rows.columns:
+                dates = pd.to_datetime(cust_rows[date_col], errors="coerce").dropna()
+                date_range = (
+                    f"{dates.min().date()} → {dates.max().date()}"
+                    if not dates.empty
+                    else "—"
+                )
+            else:
+                date_range = "—"
+
+            st.markdown(
+                f"""
+                <div style='padding:12px;border-radius:8px;background:#eef5ff;border:1px solid #b7d4f7;margin:8px 0'>
+                    <div style='font-size:12px;color:#1a4d8f;font-weight:600;text-transform:uppercase;letter-spacing:.5px'>Selected customer</div>
+                    <div style='font-size:16px;font-weight:600;margin:4px 0 8px 0'>{sel_customer}</div>
+                    <div style='display:flex;gap:18px;flex-wrap:wrap'>
+                        <div>
+                            <div style='font-size:11px;color:#666'>Total owed</div>
+                            <div style='font-size:22px;font-weight:600;color:#1a73e8'>${sel_owes:,.0f}</div>
+                        </div>
+                        <div>
+                            <div style='font-size:11px;color:#666'>Invoices</div>
+                            <div style='font-size:18px;font-weight:600'>{n_invoices}</div>
+                        </div>
+                        <div>
+                            <div style='font-size:11px;color:#666'>On-time</div>
+                            <div style='font-size:14px;color:#0d652d'>${ontime_amt_c:,.0f}</div>
+                        </div>
+                        <div>
+                            <div style='font-size:11px;color:#666'>Overdue</div>
+                            <div style='font-size:14px;color:#b71c1c'>${overdue_amt_c:,.0f}</div>
+                        </div>
+                    </div>
+                    <div style='font-size:11px;color:#666;margin-top:8px'>Invoice dates: {date_range}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
             col_a, col_b = st.columns(2)
             monthly_str = col_a.text_input(
@@ -438,17 +484,32 @@ with st.sidebar:
             except ValueError:
                 monthly_val = 0.0
 
+            # Suggestion shortcuts
+            if sel_owes > 0:
+                sg1, sg2, sg3 = st.columns(3)
+                if sg1.button(f"Split equally → ${sel_owes / int(months_input):,.0f}/mo", key="_sg_split"):
+                    st.session_state["_plan_monthly_str"] = f"{sel_owes / int(months_input):,.0f}"
+                    st.rerun()
+                if sg2.button(f"Full in 6mo → ${sel_owes / 6:,.0f}/mo", key="_sg_6"):
+                    st.session_state["_plan_monthly_str"] = f"{sel_owes / 6:,.0f}"
+                    st.session_state["_plan_months"] = 6
+                    st.rerun()
+                if sg3.button(f"Full in 12mo → ${sel_owes / 12:,.0f}/mo", key="_sg_12"):
+                    st.session_state["_plan_monthly_str"] = f"{sel_owes / 12:,.0f}"
+                    st.session_state["_plan_months"] = 12
+                    st.rerun()
+
             plan_total = monthly_val * int(months_input)
             if monthly_val > 0:
                 if abs(plan_total - sel_owes) < 0.01:
                     st.success(
-                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding."
+                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding exactly."
                     )
                 else:
                     diff = plan_total - sel_owes
                     st.info(
-                        f"Plan total: ${plan_total:,.0f} vs customer owes: "
-                        f"${sel_owes:,.0f}  (Δ ${diff:+,.0f})"
+                        f"Plan total: ${plan_total:,.0f}  |  Owed: ${sel_owes:,.0f}  "
+                        f"|  Δ ${diff:+,.0f}"
                     )
 
             if st.button("Add plan", type="primary", key="_add_plan_btn"):
