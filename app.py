@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 
 import exclude_list
 from calc import (
+    apply_customer_payment_delay,
     apply_payment_plans,
     compute_avg_customer_terms,
     daily_balance_series,
@@ -145,6 +146,7 @@ ss.setdefault("terms_days_str", "0,30,45,60,75")
 ss.setdefault("weekly_sales", 0.0)
 ss.setdefault("customer_terms_days", 30)
 ss.setdefault("fm_trading_weekly", 0.0)
+ss.setdefault("customer_payment_delay_days", 0)
 ss.setdefault("payment_plans", [])
 ss.setdefault("snapshot_saved_at", None)
 ss.setdefault("last_saved_settings", None)
@@ -168,6 +170,8 @@ if not ss.loaded:
             ss.customer_terms_days = int(parsed["customer_terms_days"])
         if parsed.get("fm_trading_weekly") is not None:
             ss.fm_trading_weekly = float(parsed["fm_trading_weekly"])
+        if parsed.get("customer_payment_delay_days") is not None:
+            ss.customer_payment_delay_days = int(parsed["customer_payment_delay_days"])
         if parsed.get("payment_plans"):
             ss.payment_plans = list(parsed["payment_plans"])
         ss.snapshot_saved_at = parsed.get("saved_at")
@@ -193,6 +197,7 @@ if not ss.loaded:
         ss.terms_days_str,
         ss.weekly_sales,
         ss.customer_terms_days,
+        ss.customer_payment_delay_days,
         ss.fm_trading_weekly,
         _plans_signature(ss.payment_plans),
     )
@@ -226,6 +231,7 @@ def _push_snapshot(reason: str) -> None:
         customer_terms_days=ss.customer_terms_days,
         fm_trading_weekly=ss.fm_trading_weekly,
         payment_plans=ss.payment_plans,
+        customer_payment_delay_days=ss.customer_payment_delay_days,
     )
     ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
     if ok:
@@ -317,6 +323,15 @@ with st.sidebar:
             value=str(int(ss.customer_terms_days or default_cust_terms)),
             help="Days from sale to cash. Defaults to the detected average.",
         )
+        late_str = st.text_input(
+            "Customer late payment delay (days)",
+            value=str(int(ss.customer_payment_delay_days)),
+            help=(
+                "On average, customers pay this many days after the invoice's "
+                "value date. Shifts every OMD invoice forward by this many days "
+                "in the projection. Set to 0 if customers pay on time."
+            ),
+        )
 
         st.markdown("##### 🏢 FM Trading (sister company)")
         fm_weekly_str = st.text_input(
@@ -339,6 +354,9 @@ with st.sidebar:
         ss.customer_terms_days = max(
             0, min(365, _parse_int(cust_terms_str, ss.customer_terms_days))
         )
+        ss.customer_payment_delay_days = max(
+            0, min(180, _parse_int(late_str, ss.customer_payment_delay_days))
+        )
         ss.fm_trading_weekly = _parse_money(fm_weekly_str, ss.fm_trading_weekly)
 
     try:
@@ -360,6 +378,7 @@ with st.sidebar:
         ss.terms_days_str,
         ss.weekly_sales,
         ss.customer_terms_days,
+        ss.customer_payment_delay_days,
         ss.fm_trading_weekly,
         plans_sig,
     )
@@ -689,7 +708,8 @@ with st.sidebar:
 # ---------- main pane ----------
 st.title("💰 Cash Flow Calendar")
 
-existing_inflows = apply_payment_plans(ss.payments_in, ss.payment_plans)
+_omd_delayed = apply_customer_payment_delay(ss.payments_in, ss.customer_payment_delay_days)
+existing_inflows = apply_payment_plans(_omd_delayed, ss.payment_plans)
 projected = project_future_sales(today, end_date, ss.weekly_sales, ss.customer_terms_days)
 fm_deposits = project_fm_deposits(today, end_date, ss.fm_trading_weekly)
 inflow_parts = [df for df in [existing_inflows, projected, fm_deposits] if not df.empty]

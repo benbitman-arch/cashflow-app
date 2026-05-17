@@ -76,6 +76,32 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
     return float((df["gap"] * df["amount_usd"]).sum() / df["amount_usd"].sum())
 
 
+def apply_customer_payment_delay(
+    payments_in: pd.DataFrame, delay_days: int
+) -> pd.DataFrame:
+    """Shift OMD invoice value_dates by `delay_days` to model typical late payment.
+
+    Customers often pay several days after the invoice value_date. This shifts
+    every OMD row's value_date forward by the given number of days. It does
+    NOT touch synthetic sources (projected_sales, fm_trading, payment_plan).
+    The projected_sales generator already uses customer_terms_days, which is
+    derived from historical OMD data and already reflects average lateness.
+    """
+    if delay_days == 0 or payments_in is None or payments_in.empty:
+        return payments_in if payments_in is not None else pd.DataFrame()
+    if "source" not in payments_in.columns or "value_date" not in payments_in.columns:
+        return payments_in
+    df = payments_in.copy()
+    mask = df["source"] == "omd_debt"
+    if not mask.any():
+        return df
+    delta = timedelta(days=int(delay_days))
+    df.loc[mask, "value_date"] = df.loc[mask, "value_date"].apply(
+        lambda d: (d + delta) if d is not None and not pd.isna(d) else d
+    )
+    return df
+
+
 def apply_payment_plans(
     payments_in: pd.DataFrame, plans: list[dict]
 ) -> pd.DataFrame:
