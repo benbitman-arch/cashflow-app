@@ -213,19 +213,9 @@ def parse_omd_debt(file) -> ParseResult:
             )
             continue
         original_value_date = d
-        if d < today:
-            # Overdue receivables — uncertain when (or if) they'll arrive. Don't
-            # auto-credit them in the projection; surface separately.
-            dropped.append(
-                {
-                    "reason": "overdue (excluded from projection)",
-                    "name": name,
-                    "amount": amt,
-                    "value_date": d,
-                    "reference_date": ref_d,
-                }
-            )
-            continue
+        is_overdue = d < today
+        if is_overdue:
+            d = today  # treat overdue as arriving today in the projection
         out.append(
             {
                 "source": "omd_debt",
@@ -234,6 +224,7 @@ def parse_omd_debt(file) -> ParseResult:
                 "value_date": d,
                 "reference_date": ref_d,
                 "original_value_date": original_value_date,
+                "is_overdue": is_overdue,
                 "info": "",
             }
         )

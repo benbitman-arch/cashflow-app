@@ -391,19 +391,18 @@ if outflows.empty and inflows.empty:
 
 # summary cards
 total_in = float(inflows["amount_usd"].sum()) if not inflows.empty else 0.0
-real_in_ontime = (
-    float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
-)
-real_in_overdue = (
-    float(
-        ss.excluded_omd.loc[
-            ss.excluded_omd["reason"] == "overdue (excluded from projection)",
-            "amount",
-        ].sum()
+if not existing_inflows.empty and "is_overdue" in existing_inflows.columns:
+    real_in_overdue = float(
+        existing_inflows.loc[existing_inflows["is_overdue"], "amount_usd"].sum()
     )
-    if not ss.excluded_omd.empty and "reason" in ss.excluded_omd.columns
-    else 0.0
-)
+    real_in_ontime = float(
+        existing_inflows.loc[~existing_inflows["is_overdue"], "amount_usd"].sum()
+    )
+else:
+    real_in_ontime = (
+        float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
+    )
+    real_in_overdue = 0.0
 real_in = real_in_ontime + real_in_overdue
 projected_in = (
     (float(projected["amount_usd"].sum()) if not projected.empty else 0.0)
@@ -413,14 +412,6 @@ total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
 overdue_amt = (
     float(outflows.loc[outflows["due_date"] <= today, "amount_usd"].sum())
     if not outflows.empty
-    else 0.0
-)
-overdue_receivables_amt = (
-    float(ss.excluded_omd.loc[
-        ss.excluded_omd["reason"] == "overdue (excluded from projection)",
-        "amount",
-    ].sum())
-    if not ss.excluded_omd.empty and "reason" in ss.excluded_omd.columns
     else 0.0
 )
 cash_now = ss.current_bank - overdue_amt
@@ -461,8 +452,8 @@ c4.metric(
     delta_color="off",
     help=(
         "All outstanding customer invoices from the OMD file. "
-        f"On-time: ${real_in_ontime:,.0f}. "
-        f"Overdue (excluded from forward projection): ${real_in_overdue:,.0f}."
+        f"On-time (value_date >= today): ${real_in_ontime:,.0f}. "
+        f"Overdue (value_date < today, clamped to today in projection): ${real_in_overdue:,.0f}."
     ),
 )
 c5.metric(
@@ -480,13 +471,15 @@ if overdue_amt > 0 and cash_now < 0:
         f"⚠️ Outstanding payments due by today (${overdue_amt:,.0f}) exceed your current "
         f"bank balance (${ss.current_bank:,.0f}) by ${-cash_now:,.0f}. "
         f"The calendar projects when you'll close this gap (assuming projected sales, "
-        f"FM Trading deposits, and on-time customer payments arrive)."
+        f"FM Trading deposits, overdue customer collections, and on-time customer "
+        f"payments all arrive)."
     )
 
-if overdue_receivables_amt > 0:
+if real_in_overdue > 0:
     st.info(
-        f"ℹ️ ${overdue_receivables_amt:,.0f} in overdue customer receivables are NOT counted "
-        f"in the projection (uncertain when/if they'll arrive). Visible in Raw data tab."
+        f"ℹ️ ${real_in_overdue:,.0f} in overdue customer receivables are counted in "
+        f"the projection as arriving **today** (clamped). If your late customers "
+        f"won't pay that fast, the projection is optimistic."
     )
 
 # Today's recommendation hero card — shows actual balance even when negative
