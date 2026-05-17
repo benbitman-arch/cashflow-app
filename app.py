@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 
 import exclude_list
 from calc import (
+    apply_payment_plans,
     compute_avg_customer_terms,
     daily_balance_series,
     max_buy,
@@ -144,6 +145,7 @@ ss.setdefault("terms_days_str", "0,30,45,60,75")
 ss.setdefault("weekly_sales", 0.0)
 ss.setdefault("customer_terms_days", 30)
 ss.setdefault("fm_trading_weekly", 0.0)
+ss.setdefault("payment_plans", [])
 ss.setdefault("snapshot_saved_at", None)
 ss.setdefault("last_saved_settings", None)
 
@@ -166,6 +168,8 @@ if not ss.loaded:
             ss.customer_terms_days = int(parsed["customer_terms_days"])
         if parsed.get("fm_trading_weekly") is not None:
             ss.fm_trading_weekly = float(parsed["fm_trading_weekly"])
+        if parsed.get("payment_plans"):
+            ss.payment_plans = list(parsed["payment_plans"])
         ss.snapshot_saved_at = parsed.get("saved_at")
     # Mark the just-loaded settings as the baseline so we don't immediately re-save.
     ss.last_saved_settings = (
@@ -175,6 +179,7 @@ if not ss.loaded:
         ss.weekly_sales,
         ss.customer_terms_days,
         ss.fm_trading_weekly,
+        tuple(sorted((p.get("customer", ""), float(p.get("monthly_amount", 0)), int(p.get("months", 0)), str(p.get("start_date", ""))) for p in ss.payment_plans)),
     )
     ss.loaded = True
 
@@ -205,6 +210,7 @@ def _push_snapshot(reason: str) -> None:
         weekly_sales=ss.weekly_sales,
         customer_terms_days=ss.customer_terms_days,
         fm_trading_weekly=ss.fm_trading_weekly,
+        payment_plans=ss.payment_plans,
     )
     ok, msg = save_to_github(snap, token=GH_TOKEN, repo=GH_REPO)
     if ok:
@@ -334,6 +340,7 @@ with st.sidebar:
         ss.weekly_sales,
         ss.customer_terms_days,
         ss.fm_trading_weekly,
+        tuple(sorted((p.get("customer", ""), float(p.get("monthly_amount", 0)), int(p.get("months", 0)), str(p.get("start_date", ""))) for p in ss.payment_plans)),
     )
     if ss.last_saved_settings != current_settings:
         ss.last_saved_settings = current_settings
@@ -350,6 +357,115 @@ with st.sidebar:
         st.caption(f"☁️ Last cloud snapshot: {ss.snapshot_saved_at}")
 
     st.divider()
+    st.header("Customer payment plans")
+    st.caption(
+        "Override a customer's OMD invoices with a monthly schedule. "
+        "Example: customer owes $600K → $60K/mo × 10 mo. The calendar and "
+        "all calculations adjust accordingly."
+    )
+
+    # List existing plans
+    if ss.payment_plans:
+        for i, p in enumerate(ss.payment_plans):
+            cols = st.columns([7, 1])
+            cols[0].markdown(
+                f"**{p['customer']}**  \n"
+                f"<span style='font-size:12px;color:#666'>"
+                f"${float(p['monthly_amount']):,.0f}/mo × {int(p['months'])} mo "
+                f"from {p['start_date']} = ${float(p['monthly_amount']) * int(p['months']):,.0f}</span>",
+                unsafe_allow_html=True,
+            )
+            if cols[1].button("✕", key=f"_remove_plan_{i}", help="Remove this plan"):
+                ss.payment_plans.pop(i)
+                st.rerun()
+    else:
+        st.caption("_No plans yet._")
+
+    # Add a new plan
+    with st.expander("➕ Add payment plan"):
+        # Customer dropdown sourced from OMD data
+        if not ss.payments_in.empty and "party" in ss.payments_in.columns:
+            all_customers = sorted(
+                set(str(n) for n in ss.payments_in["party"].dropna() if str(n).strip())
+            )
+        else:
+            all_customers = []
+
+        if not all_customers:
+            st.warning("Upload OMD file first to see your customer list.")
+        else:
+            # Show how much each customer currently owes for context
+            owed_by_customer = (
+                ss.payments_in.groupby("party")["amount_usd"].sum().to_dict()
+                if not ss.payments_in.empty
+                else {}
+            )
+            options = [
+                f"{c}  —  owes ${owed_by_customer.get(c, 0):,.0f}"
+                for c in all_customers
+            ]
+            sel_idx = st.selectbox(
+                "Customer (type to search)",
+                options=range(len(options)),
+                format_func=lambda i: options[i],
+                key="_plan_customer_idx",
+            )
+            sel_customer = all_customers[sel_idx]
+            sel_owes = owed_by_customer.get(sel_customer, 0)
+
+            col_a, col_b = st.columns(2)
+            monthly_str = col_a.text_input(
+                "Monthly amount (USD)", value="0", key="_plan_monthly_str"
+            )
+            months_input = col_b.number_input(
+                "Number of months",
+                min_value=1,
+                max_value=120,
+                value=10,
+                step=1,
+                key="_plan_months",
+            )
+            start_input = st.date_input(
+                "First payment date",
+                value=today + timedelta(days=30),
+                key="_plan_start",
+            )
+
+            try:
+                monthly_val = float(
+                    str(monthly_str).replace(",", "").replace(" ", "").replace("$", "")
+                )
+            except ValueError:
+                monthly_val = 0.0
+
+            plan_total = monthly_val * int(months_input)
+            if monthly_val > 0:
+                if abs(plan_total - sel_owes) < 0.01:
+                    st.success(
+                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding."
+                    )
+                else:
+                    diff = plan_total - sel_owes
+                    st.info(
+                        f"Plan total: ${plan_total:,.0f} vs customer owes: "
+                        f"${sel_owes:,.0f}  (Δ ${diff:+,.0f})"
+                    )
+
+            if st.button("Add plan", type="primary", key="_add_plan_btn"):
+                if monthly_val <= 0 or months_input < 1:
+                    st.error("Monthly amount and months must be positive.")
+                else:
+                    ss.payment_plans.append(
+                        {
+                            "customer": sel_customer,
+                            "monthly_amount": monthly_val,
+                            "months": int(months_input),
+                            "start_date": start_input.isoformat(),
+                        }
+                    )
+                    st.rerun()
+
+    st.divider()
     st.header("Exclude list")
     with st.expander(f"{len(exclude_list.EXCLUDE_NAMES)} hardcoded names"):
         for n in exclude_list.EXCLUDE_NAMES:
@@ -364,7 +480,7 @@ with st.sidebar:
 # ---------- main pane ----------
 st.title("💰 Cash Flow Calendar")
 
-existing_inflows = ss.payments_in
+existing_inflows = apply_payment_plans(ss.payments_in, ss.payment_plans)
 projected = project_future_sales(today, end_date, ss.weekly_sales, ss.customer_terms_days)
 fm_deposits = project_fm_deposits(today, end_date, ss.fm_trading_weekly)
 inflow_parts = [df for df in [existing_inflows, projected, fm_deposits] if not df.empty]

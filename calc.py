@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 
 
 def projected_balance(
@@ -73,6 +74,61 @@ def compute_avg_customer_terms(inflows: pd.DataFrame) -> float | None:
     if df.empty:
         return None
     return float((df["gap"] * df["amount_usd"]).sum() / df["amount_usd"].sum())
+
+
+def apply_payment_plans(
+    payments_in: pd.DataFrame, plans: list[dict]
+) -> pd.DataFrame:
+    """Override a customer's OMD entries with a monthly payment schedule.
+
+    For every plan {customer, monthly_amount, months, start_date}:
+      1. Remove every row from payments_in where party == customer
+      2. Generate `months` synthetic rows, $monthly_amount each, on consecutive
+         monthly dates starting at start_date (using calendar months, not 30 days)
+
+    Returns a new DataFrame; payments_in is not mutated.
+    """
+    if not plans or payments_in is None or payments_in.empty:
+        if plans and (payments_in is None or payments_in.empty):
+            # No OMD yet, still emit the plan rows so projection has something
+            return _plans_to_df(plans)
+        return payments_in if payments_in is not None else pd.DataFrame()
+
+    plan_customers = {p["customer"] for p in plans}
+    base = payments_in[~payments_in["party"].isin(plan_customers)].copy()
+    synth = _plans_to_df(plans)
+    if synth.empty:
+        return base
+    return pd.concat([base, synth], ignore_index=True)
+
+
+def _plans_to_df(plans: list[dict]) -> pd.DataFrame:
+    rows = []
+    for plan in plans:
+        try:
+            start = date.fromisoformat(str(plan["start_date"]))
+        except (ValueError, KeyError, TypeError):
+            continue
+        monthly = float(plan.get("monthly_amount", 0))
+        months = int(plan.get("months", 0))
+        customer = str(plan.get("customer", "")).strip()
+        if monthly <= 0 or months <= 0 or not customer:
+            continue
+        for m in range(months):
+            d = start + relativedelta(months=m)
+            rows.append(
+                {
+                    "source": "payment_plan",
+                    "party": customer,
+                    "amount_usd": monthly,
+                    "value_date": d,
+                    "reference_date": None,
+                    "original_value_date": d,
+                    "is_overdue": False,
+                    "info": f"plan {m + 1}/{months}",
+                }
+            )
+    return pd.DataFrame(rows)
 
 
 def project_fm_deposits(start: date, end: date, weekly_amount: float) -> pd.DataFrame:
