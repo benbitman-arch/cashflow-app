@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "saved_at": "2026-05-17T09:48:48Z",
+  "version": 4,
+  "saved_at": "2026-05-17T12:15:59Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -13741,7 +13741,7 @@
       "reason": "missing date",
       "name": "",
       "amount": 34201837.33,
-      "value_date": null
+      "value_date": "NaT"
     }
   ],
   "current_bank": 800000.0,
@@ -13755,5 +13755,6 @@
   ],
   "weekly_sales": 500000.0,
   "customer_terms_days": 46,
-  "fm_trading_weekly": 150000.0
+  "fm_trading_weekly": 150000.0,
+  "payment_plans": []
 }
