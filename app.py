@@ -391,7 +391,20 @@ if outflows.empty and inflows.empty:
 
 # summary cards
 total_in = float(inflows["amount_usd"].sum()) if not inflows.empty else 0.0
-real_in = float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
+real_in_ontime = (
+    float(existing_inflows["amount_usd"].sum()) if not existing_inflows.empty else 0.0
+)
+real_in_overdue = (
+    float(
+        ss.excluded_omd.loc[
+            ss.excluded_omd["reason"] == "overdue (excluded from projection)",
+            "amount",
+        ].sum()
+    )
+    if not ss.excluded_omd.empty and "reason" in ss.excluded_omd.columns
+    else 0.0
+)
+real_in = real_in_ontime + real_in_overdue
 projected_in = (
     (float(projected["amount_usd"].sum()) if not projected.empty else 0.0)
     + (float(fm_deposits["amount_usd"].sum()) if not fm_deposits.empty else 0.0)
@@ -444,7 +457,13 @@ c3.markdown(
 c4.metric(
     "Real receivables",
     f"${real_in:,.0f}",
-    help="Outstanding customer invoices from the OMD file (on-time only — overdue customers excluded from projection).",
+    delta=f"incl. ${real_in_overdue:,.0f} overdue" if real_in_overdue > 0 else None,
+    delta_color="off",
+    help=(
+        "All outstanding customer invoices from the OMD file. "
+        f"On-time: ${real_in_ontime:,.0f}. "
+        f"Overdue (excluded from forward projection): ${real_in_overdue:,.0f}."
+    ),
 )
 c5.metric(
     "Projected receivables",
