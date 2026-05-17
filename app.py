@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 from datetime import date, timedelta
 
 import pandas as pd
@@ -98,33 +97,26 @@ def _inject_money_formatter():
     components.html(_MONEY_FORMATTER_JS, height=0)
 
 
-# ---------- password gate with remember-me ----------
-def _expected_token(pw: str) -> str:
-    return hashlib.sha256(("cashflow:" + pw).encode()).hexdigest()[:32]
-
-
+# ---------- password gate ----------
 def _check_password() -> bool:
     expected = st.secrets.get("app_password", "")
     if not expected:
         st.error("App password not configured. Set `app_password` in Streamlit secrets.")
         return False
 
-    token = _expected_token(expected)
-    if st.query_params.get("t") == token:
-        st.session_state["auth_ok"] = True
+    # Strip any legacy ?t=... token from the URL so old links no longer auto-login.
+    if "t" in st.query_params:
+        del st.query_params["t"]
 
     if st.session_state.get("auth_ok"):
         return True
 
     st.title("🔒 Cash Flow Calendar")
-    st.caption("Enter the password to continue. Tick 'Remember me' and bookmark the URL to skip this next time.")
+    st.caption("Enter the password to continue.")
     pw = st.text_input("Password", type="password", key="_pw_in")
-    remember = st.checkbox("Remember me on this device", value=True)
     if st.button("Enter", type="primary") and pw:
         if pw == expected:
             st.session_state["auth_ok"] = True
-            if remember:
-                st.query_params["t"] = token
             st.rerun()
         else:
             st.error("Incorrect password.")
