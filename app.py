@@ -522,12 +522,13 @@ with st.sidebar:
 
             plan_total = monthly_val * int(months_input)
             if monthly_val > 0:
-                if abs(plan_total - sel_owes) < 0.01:
+                diff = plan_total - sel_owes
+                # treat <$1 as exact match (display rounds to whole dollars anyway)
+                if abs(diff) < 1.0:
                     st.success(
-                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding exactly."
+                        f"✓ Plan total ${plan_total:,.0f} matches customer's outstanding."
                     )
                 else:
-                    diff = plan_total - sel_owes
                     st.info(
                         f"Plan total: ${plan_total:,.0f}  |  Owed: ${sel_owes:,.0f}  "
                         f"|  Δ ${diff:+,.0f}"
