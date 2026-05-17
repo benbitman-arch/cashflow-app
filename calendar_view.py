@@ -174,34 +174,60 @@ def _week_summary_html(
     )
 
 
-def render_month(
-    year: int,
-    month: int,
+def render_range(
+    start: date,
+    end: date,
     current_bank: float,
     inflows: pd.DataFrame,
     outflows: pd.DataFrame,
     terms_days: list[int],
     safety_buffer: float,
 ) -> None:
-    cal = calendar.Calendar(firstweekday=6)  # Sunday first
-    weeks = cal.monthdayscalendar(year, month)
+    """Render the calendar as continuous Sun→Sat weeks, regardless of month boundary.
+
+    A month header is emitted whenever the midweek date crosses into a new
+    month, so users see Jun/Jul transitions inline without splitting any week.
+    """
+    st.markdown(_CSS, unsafe_allow_html=True)
     today = date.today()
     weekday_names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
-    header_html = "<div class='cf-header'>" + "".join(
-        f"<div class='cf-weekday'>{w}</div>" for w in weekday_names
-    ) + "</div>"
-    st.markdown(header_html, unsafe_allow_html=True)
+    header_html = (
+        "<div class='cf-header'>"
+        + "".join(f"<div class='cf-weekday'>{w}</div>" for w in weekday_names)
+        + "</div>"
+    )
 
-    for week in weeks:
+    # Walk back to the Sunday of `start`'s week. weekday(): Mon=0, Sun=6.
+    # Days back to last Sunday: 0 if Sun, else weekday + 1
+    days_back = 0 if start.weekday() == 6 else start.weekday() + 1
+    cur_sunday = start - timedelta(days=days_back)
+
+    last_month_shown = None
+    header_rendered = False
+
+    while cur_sunday <= end:
+        # Month label flips based on the midweek (Wednesday) date — so a Sun→Sat
+        # week that straddles a month is labelled by whichever month "owns" most
+        # of it.
+        midweek = cur_sunday + timedelta(days=3)
+        month_key = (midweek.year, midweek.month)
+        if month_key != last_month_shown:
+            st.markdown(f"#### {midweek.strftime('%B %Y')}")
+            st.markdown(header_html, unsafe_allow_html=True)
+            last_month_shown = month_key
+            header_rendered = True
+        elif not header_rendered:
+            st.markdown(header_html, unsafe_allow_html=True)
+            header_rendered = True
+
+        # Build the 7 cells for the week
         cells = []
-        week_dates = []
-        for i, day in enumerate(week):
-            if day == 0:
+        for i in range(7):
+            d = cur_sunday + timedelta(days=i)
+            if d > end:
                 cells.append("<div></div>")
                 continue
-            d = date(year, month, day)
-            week_dates.append(d)
             cells.append(
                 _cell_html(
                     d,
@@ -215,39 +241,17 @@ def render_month(
                     safety_buffer,
                 )
             )
+
         grid_html = "<div class='cf-grid'>" + "".join(cells) + "</div>"
-        if week_dates:
-            summary = _week_summary_html(
-                min(week_dates),
-                max(week_dates),
-                current_bank,
-                inflows,
-                outflows,
-                safety_buffer,
-            )
-        else:
-            summary = ""
+        # Week summary spans the FULL Sunday→Saturday, regardless of month/horizon
+        summary = _week_summary_html(
+            cur_sunday,
+            cur_sunday + timedelta(days=6),
+            current_bank,
+            inflows,
+            outflows,
+            safety_buffer,
+        )
         st.markdown(grid_html + summary, unsafe_allow_html=True)
 
-
-def render_range(
-    start: date,
-    end: date,
-    current_bank: float,
-    inflows: pd.DataFrame,
-    outflows: pd.DataFrame,
-    terms_days: list[int],
-    safety_buffer: float,
-) -> None:
-    st.markdown(_CSS, unsafe_allow_html=True)
-    cur = date(start.year, start.month, 1)
-    while cur <= end:
-        st.markdown(f"#### {cur.strftime('%B %Y')}")
-        render_month(
-            cur.year, cur.month, current_bank, inflows, outflows, terms_days, safety_buffer
-        )
-        st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-        if cur.month == 12:
-            cur = date(cur.year + 1, 1, 1)
-        else:
-            cur = date(cur.year, cur.month + 1, 1)
+        cur_sunday += timedelta(days=7)
