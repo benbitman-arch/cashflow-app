@@ -172,6 +172,21 @@ if not ss.loaded:
             ss.payment_plans = list(parsed["payment_plans"])
         ss.snapshot_saved_at = parsed.get("saved_at")
     # Mark the just-loaded settings as the baseline so we don't immediately re-save.
+    def _plans_signature(plans: list[dict]):
+        return tuple(
+            sorted(
+                (
+                    p.get("customer", ""),
+                    float(p.get("monthly_amount", 0)),
+                    int(p.get("months", 0)),
+                    str(p.get("start_date", "")),
+                    float(p.get("plan_amount", 0) or 0),
+                )
+                for p in plans
+            )
+        )
+
+    ss._plans_signature_fn = _plans_signature
     ss.last_saved_settings = (
         ss.current_bank,
         ss.safety_buffer,
@@ -179,7 +194,7 @@ if not ss.loaded:
         ss.weekly_sales,
         ss.customer_terms_days,
         ss.fm_trading_weekly,
-        tuple(sorted((p.get("customer", ""), float(p.get("monthly_amount", 0)), int(p.get("months", 0)), str(p.get("start_date", ""))) for p in ss.payment_plans)),
+        _plans_signature(ss.payment_plans),
     )
     ss.loaded = True
 
@@ -333,6 +348,12 @@ with st.sidebar:
         terms_days = [0, 30, 45, 60, 75]
 
     # Auto-save to cloud whenever a setting changed compared to the last persisted state.
+    _plans_signature_fn = ss.get("_plans_signature_fn")
+    plans_sig = (
+        _plans_signature_fn(ss.payment_plans)
+        if _plans_signature_fn
+        else tuple()
+    )
     current_settings = (
         ss.current_bank,
         ss.safety_buffer,
@@ -340,7 +361,7 @@ with st.sidebar:
         ss.weekly_sales,
         ss.customer_terms_days,
         ss.fm_trading_weekly,
-        tuple(sorted((p.get("customer", ""), float(p.get("monthly_amount", 0)), int(p.get("months", 0)), str(p.get("start_date", ""))) for p in ss.payment_plans)),
+        plans_sig,
     )
     if ss.last_saved_settings != current_settings:
         ss.last_saved_settings = current_settings
@@ -364,22 +385,77 @@ with st.sidebar:
         "overdue portion is replaced by the plan."
     )
 
-    # List existing plans
+    # List existing plans with inline edit
     if ss.payment_plans:
         for i, p in enumerate(ss.payment_plans):
-            cols = st.columns([7, 1])
             plan_total = float(p['monthly_amount']) * int(p['months'])
-            cols[0].markdown(
-                f"**{p['customer']}**  \n"
-                f"<span style='font-size:12px;color:#666'>"
-                f"${float(p['monthly_amount']):,.0f}/mo × {int(p['months'])} mo "
-                f"from {p['start_date']} = ${plan_total:,.0f} "
-                f"<i>(replaces overdue)</i></span>",
-                unsafe_allow_html=True,
-            )
-            if cols[1].button("✕", key=f"_remove_plan_{i}", help="Remove this plan"):
-                ss.payment_plans.pop(i)
-                st.rerun()
+            edit_key = f"_edit_plan_{i}"
+            if ss.get(edit_key, False):
+                # Inline edit form for this plan
+                with st.container(border=True):
+                    st.markdown(f"**Editing: {p['customer']}**")
+                    e_monthly_str = st.text_input(
+                        "Monthly amount (USD)",
+                        value=f"{float(p['monthly_amount']):,.0f}",
+                        key=f"_edit_monthly_{i}",
+                    )
+                    e_months = st.number_input(
+                        "Number of months",
+                        min_value=1,
+                        max_value=120,
+                        value=int(p['months']),
+                        step=1,
+                        key=f"_edit_months_{i}",
+                    )
+                    try:
+                        e_start = date.fromisoformat(str(p['start_date']))
+                    except ValueError:
+                        e_start = today + timedelta(days=30)
+                    e_start_input = st.date_input(
+                        "First payment date",
+                        value=e_start,
+                        key=f"_edit_start_{i}",
+                    )
+                    try:
+                        e_monthly = float(
+                            str(e_monthly_str).replace(",", "").replace(" ", "").replace("$", "")
+                        )
+                    except ValueError:
+                        e_monthly = 0.0
+
+                    cols_e = st.columns(2)
+                    if cols_e[0].button("💾 Save", key=f"_save_edit_{i}", type="primary", use_container_width=True):
+                        if e_monthly <= 0 or e_months < 1:
+                            st.error("Monthly amount and months must be positive.")
+                        else:
+                            ss.payment_plans[i] = {
+                                "customer": p["customer"],
+                                "monthly_amount": e_monthly,
+                                "months": int(e_months),
+                                "start_date": e_start_input.isoformat(),
+                                "plan_amount": e_monthly * int(e_months),
+                            }
+                            ss[edit_key] = False
+                            st.rerun()
+                    if cols_e[1].button("Cancel", key=f"_cancel_edit_{i}", use_container_width=True):
+                        ss[edit_key] = False
+                        st.rerun()
+            else:
+                cols = st.columns([6, 1, 1])
+                cols[0].markdown(
+                    f"**{p['customer']}**  \n"
+                    f"<span style='font-size:12px;color:#666'>"
+                    f"${float(p['monthly_amount']):,.0f}/mo × {int(p['months'])} mo "
+                    f"from {p['start_date']} = ${plan_total:,.0f} "
+                    f"<i>(replaces overdue)</i></span>",
+                    unsafe_allow_html=True,
+                )
+                if cols[1].button("✎", key=f"_edit_btn_{i}", help="Edit this plan"):
+                    ss[edit_key] = True
+                    st.rerun()
+                if cols[2].button("✕", key=f"_remove_plan_{i}", help="Remove this plan"):
+                    ss.payment_plans.pop(i)
+                    st.rerun()
     else:
         st.caption("_No plans yet._")
 
