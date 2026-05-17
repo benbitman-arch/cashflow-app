@@ -428,54 +428,73 @@ overdue_amt = (
 cash_now = ss.current_bank - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
+
+def _short_money(x: float) -> str:
+    """Compact money: $1.23M / $123.4K / $123, with sign."""
+    sign = "-" if x < 0 else ""
+    a = abs(x)
+    if a >= 1_000_000:
+        return f"{sign}${a/1_000_000:.2f}M"
+    if a >= 10_000:
+        return f"{sign}${a/1_000:.0f}K"
+    if a >= 1_000:
+        return f"{sign}${a/1_000:.1f}K"
+    return f"{sign}${a:.0f}"
+
+
 c1, c2, c3, c4, c5, c6 = st.columns(6)
-c1.metric("Current bank", f"${ss.current_bank:,.0f}")
 
-# Custom 'Cash now' metric so we can color the value red when negative
-cash_color = "#b71c1c" if cash_now < 0 else ("#0d652d" if cash_now > 0 else "#444")
-sign = "-$" if cash_now < 0 else "$"
-cash_value_str = f"{sign}{abs(cash_now):,.0f}"
-overdue_html = (
-    f"<div style='font-size:13px;color:#b71c1c;margin-top:4px'>"
-    f"⚠️ ${overdue_amt:,.0f} overdue</div>"
-    if overdue_amt > 0
-    else ""
-)
-c2.markdown(
-    f"<div style='font-size:14px;color:#666'>Cash now (after overdue)</div>"
-    f"<div style='font-size:32px;font-weight:600;color:{cash_color};line-height:1.3'>{cash_value_str}</div>"
-    f"{overdue_html}",
-    unsafe_allow_html=True,
+
+def _card(col, label: str, value: str, sub: str = "", color: str = "#1a1a1a"):
+    """Compact metric card with adaptive font size — never overflows."""
+    sub_html = (
+        f"<div style='font-size:12px;color:#666;margin-top:4px;white-space:nowrap'>{sub}</div>"
+        if sub
+        else ""
+    )
+    col.markdown(
+        f"<div style='font-size:13px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>{label}</div>"
+        f"<div style='font-size:clamp(18px, 2.2vw, 28px);font-weight:600;color:{color};line-height:1.25;white-space:nowrap;overflow:hidden'>{value}</div>"
+        f"{sub_html}",
+        unsafe_allow_html=True,
+    )
+
+
+_card(c1, "Current bank", _short_money(ss.current_bank))
+
+# Cash now (red when negative)
+cash_color = "#b71c1c" if cash_now < 0 else ("#0d652d" if cash_now > 0 else "#1a1a1a")
+_card(
+    c2,
+    "Cash now (after overdue)",
+    _short_money(cash_now),
+    sub=(f"⚠️ {_short_money(overdue_amt)} overdue" if overdue_amt > 0 else ""),
+    color=cash_color,
 )
 
-# Total debts (everything we still owe — checks + foreign supplier debt)
-c3.markdown(
-    f"<div style='font-size:14px;color:#666'>Total debts</div>"
-    f"<div style='font-size:32px;font-weight:600;color:#b71c1c;line-height:1.3'>${total_out:,.0f}</div>"
-    f"<div style='font-size:13px;color:#666;margin-top:4px'>everything still to pay</div>",
-    unsafe_allow_html=True,
+# Total debts
+_card(
+    c3,
+    "Total debts",
+    _short_money(total_out),
+    sub="everything still to pay",
+    color="#b71c1c",
 )
 
-c4.metric(
+# Real receivables
+_card(
+    c4,
     "Real receivables",
-    f"${real_in:,.0f}",
-    delta=f"incl. ${real_in_overdue:,.0f} overdue" if real_in_overdue > 0 else None,
-    delta_color="off",
-    help=(
-        "All outstanding customer invoices from the OMD file. "
-        f"On-time (value_date >= today): ${real_in_ontime:,.0f}. "
-        f"Overdue (value_date < today, clamped to today in projection): ${real_in_overdue:,.0f}."
-    ),
+    _short_money(real_in),
+    sub=(f"↑ incl. {_short_money(real_in_overdue)} overdue" if real_in_overdue > 0 else ""),
 )
-c5.metric(
-    "Projected receivables",
-    f"${projected_in:,.0f}",
-    help=(
-        f"Synthetic future income over the next {horizon} days: weekly projected sales × {horizon // 7} weeks "
-        "+ FM Trading weekly deposits."
-    ),
+_card(c5, "Projected receivables", _short_money(projected_in), sub=f"sales+FM over {horizon}d")
+_card(
+    c6,
+    f"Projected at +{horizon}d",
+    _short_money(net_horizon),
+    color=("#b71c1c" if net_horizon < 0 else "#0d652d" if net_horizon > 0 else "#1a1a1a"),
 )
-c6.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 
 if overdue_amt > 0 and cash_now < 0:
     st.error(
