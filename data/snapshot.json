@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "saved_at": "2026-05-17T12:42:42Z",
+  "saved_at": "2026-05-17T12:49:52Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -13761,8 +13761,8 @@
       "customer": "Genovese Jewelers",
       "monthly_amount": 59078.0,
       "months": 10,
-      "start_date": "2026-06-16",
-      "plan_amount": 590777.0
+      "start_date": "2026-05-22",
+      "plan_amount": 590780.0
     }
   ]
 }
