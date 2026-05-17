@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "saved_at": "2026-05-17T13:01:31Z",
+  "saved_at": "2026-05-17T13:02:01Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -13766,5 +13766,5 @@
     }
   ],
   "customer_payment_delay_days": 0,
-  "weekly_expenses": 0.0
+  "weekly_expenses": 110000.0
 }
