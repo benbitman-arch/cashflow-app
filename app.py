@@ -520,6 +520,25 @@ with st.sidebar:
                     use_container_width=True,
                 )
 
+                # Auto-compute months from the monthly amount
+                if monthly_val > 0:
+                    import math
+
+                    auto_months = max(1, min(120, math.ceil(sel_owes / monthly_val)))
+                    last_pay = monthly_val * auto_months - sel_owes
+                    last_note = (
+                        f" (last payment ${monthly_val - last_pay:,.0f})"
+                        if abs(last_pay) > 0.5
+                        else ""
+                    )
+                    st.button(
+                        f"At ${monthly_val:,.0f}/mo  →  set months to {auto_months}{last_note}",
+                        key="_sg_auto_months",
+                        on_click=_apply_shortcut,
+                        args=(monthly_val, auto_months),
+                        use_container_width=True,
+                    )
+
             plan_total = monthly_val * int(months_input)
             if monthly_val > 0:
                 diff = plan_total - sel_owes
