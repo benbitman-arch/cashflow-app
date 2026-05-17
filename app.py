@@ -408,7 +408,7 @@ overdue_receivables_amt = (
 cash_now = ss.current_bank - overdue_amt
 net_horizon = projected_balance(end_date, ss.current_bank, inflows, outflows)
 
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 c1.metric("Current bank", f"${ss.current_bank:,.0f}")
 
 # Custom 'Cash now' metric so we can color the value red when negative
@@ -428,8 +428,16 @@ c2.markdown(
     unsafe_allow_html=True,
 )
 
-c3.metric("Receivables outstanding", f"${total_in:,.0f}")
-c4.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
+# Total debts (everything we still owe — checks + foreign supplier debt)
+c3.markdown(
+    f"<div style='font-size:14px;color:#666'>Total debts</div>"
+    f"<div style='font-size:32px;font-weight:600;color:#b71c1c;line-height:1.3'>${total_out:,.0f}</div>"
+    f"<div style='font-size:13px;color:#666;margin-top:4px'>everything still to pay</div>",
+    unsafe_allow_html=True,
+)
+
+c4.metric("Receivables outstanding", f"${total_in:,.0f}")
+c5.metric(f"Projected at +{horizon}d", f"${net_horizon:,.0f}")
 
 if overdue_amt > 0 and cash_now < 0:
     st.error(
