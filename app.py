@@ -774,10 +774,20 @@ else:
         else 0.0
     )
 real_in = real_in_ontime + real_in_overdue
-projected_in = (
-    (float(projected["amount_usd"].sum()) if not projected.empty else 0.0)
-    + (float(fm_deposits["amount_usd"].sum()) if not fm_deposits.empty else 0.0)
-)
+# Projected receivables LANDING within the horizon window — i.e., cash that
+# actually arrives in the bank by end_date. Sales generated within the
+# horizon but whose value_date pushes past end_date (due to customer_terms_days
+# lag) are excluded from this total but still contribute to the calendar/chart.
+projected_in = 0.0
+projected_in_full = 0.0
+if not projected.empty:
+    in_window = projected[projected["value_date"] <= end_date]
+    projected_in += float(in_window["amount_usd"].sum())
+    projected_in_full += float(projected["amount_usd"].sum())
+if not fm_deposits.empty:
+    in_window = fm_deposits[fm_deposits["value_date"] <= end_date]
+    projected_in += float(in_window["amount_usd"].sum())
+    projected_in_full += float(fm_deposits["amount_usd"].sum())
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
 # Split total debts: real obligations (checks + supplier debt) vs synthetic
 # recurring weekly expenses (salaries, office). Show full total + breakdown.
@@ -859,7 +869,19 @@ _card(
     _short_money(real_in),
     sub=(f"↑ incl. {_short_money(real_in_overdue)} overdue" if real_in_overdue > 0 else ""),
 )
-_card(c5, "Projected receivables", _short_money(projected_in), sub=f"sales+FM over {horizon}d")
+_card(
+    c5,
+    "Projected receivables",
+    _short_money(projected_in),
+    sub=(
+        f"sales+FM arriving in {horizon}d"
+        + (
+            f" (+{_short_money(projected_in_full - projected_in)} lands after)"
+            if projected_in_full - projected_in > 1
+            else ""
+        )
+    ),
+)
 _card(
     c6,
     f"Projected at +{horizon}d",
