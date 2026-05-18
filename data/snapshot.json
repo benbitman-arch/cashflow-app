@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "saved_at": "2026-05-18T07:51:50Z",
+  "saved_at": "2026-05-18T08:00:32Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -13981,7 +13981,7 @@
       "reason": "missing date",
       "name": "",
       "amount": 34166728.91,
-      "value_date": null
+      "value_date": "NaT"
     }
   ],
   "current_bank": 800000.0,
@@ -14006,5 +14006,5 @@
     }
   ],
   "customer_payment_delay_days": 7,
-  "weekly_expenses": 110000.0
+  "weekly_expenses": 150000.0
 }
