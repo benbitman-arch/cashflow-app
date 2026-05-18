@@ -774,20 +774,15 @@ else:
         else 0.0
     )
 real_in = real_in_ontime + real_in_overdue
-# Projected receivables LANDING within the horizon window — i.e., cash that
-# actually arrives in the bank by end_date. Sales generated within the
-# horizon but whose value_date pushes past end_date (due to customer_terms_days
-# lag) are excluded from this total but still contribute to the calendar/chart.
-projected_in = 0.0
-projected_in_full = 0.0
-if not projected.empty:
-    in_window = projected[projected["value_date"] <= end_date]
-    projected_in += float(in_window["amount_usd"].sum())
-    projected_in_full += float(projected["amount_usd"].sum())
-if not fm_deposits.empty:
-    in_window = fm_deposits[fm_deposits["value_date"] <= end_date]
-    projected_in += float(in_window["amount_usd"].sum())
-    projected_in_full += float(fm_deposits["amount_usd"].sum())
+# Projected receivables = ALL inflows arriving within the horizon window.
+# Includes real OMD (on-time + overdue clamped to today), projected weekly
+# sales, FM Trading deposits, and payment-plan installments — anything we
+# expect to land in the bank within `end_date`.
+projected_in = (
+    float(inflows.loc[inflows["value_date"] <= end_date, "amount_usd"].sum())
+    if not inflows.empty
+    else 0.0
+)
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
 # Split total debts: real obligations (checks + supplier debt) vs synthetic
 # recurring weekly expenses (salaries, office). Show full total + breakdown.
@@ -873,14 +868,7 @@ _card(
     c5,
     "Projected receivables",
     _short_money(projected_in),
-    sub=(
-        f"sales+FM arriving in {horizon}d"
-        + (
-            f" (+{_short_money(projected_in_full - projected_in)} lands after)"
-            if projected_in_full - projected_in > 1
-            else ""
-        )
-    ),
+    sub=f"all income arriving in {horizon}d",
 )
 _card(
     c6,
