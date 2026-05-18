@@ -85,7 +85,11 @@ def parse_checks(file) -> ParseResult:
     df = _read_excel(file)
     name_col = _find_col(df, ["שם"], "Checks file (supplier name)")
     date_col = _find_col(df, ["תאריך תחזית"], "Checks file (due date)")
-    amount_col = _find_col(df, ["TTL Invoice"], "Checks file (amount)")
+    # CRM exports may label the amount column as either 'TTL Invoice' (old
+    # English export) or 'חיוב' (new Hebrew debit column).
+    amount_col = _find_col(
+        df, ["TTL Invoice", "חיוב"], "Checks file (amount)"
+    )
     bank_col_name = None
     try:
         bank_col_name = _find_col(df, ["בנק"], "Checks file (bank)")
