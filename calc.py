@@ -246,21 +246,23 @@ def project_future_sales(
 ) -> pd.DataFrame:
     """Generate synthetic weekly receivables for projected future sales.
 
-    First sale week begins `start + 7 days` (not `start` itself), so we don't
-    project new revenue for a week that has already partially passed and
-    whose actual sales would already be visible in the OMD file.
+    First sale week begins `start + 7 days` (today's week has already partially
+    passed). We only generate weeks whose cash actually LANDS within the
+    horizon — i.e. sale_date + customer_terms_days <= end — so every projected
+    sale is visible on the calendar and nothing spills past day 90.
     """
     if weekly_sales <= 0:
         return pd.DataFrame()
     rows = []
     sale_date = start + timedelta(days=7)
-    while sale_date <= end:
+    terms = timedelta(days=int(customer_terms_days))
+    while sale_date + terms <= end:
         rows.append(
             {
                 "source": "projected_sales",
                 "party": f"projected ({sale_date.isoformat()})",
                 "amount_usd": float(weekly_sales),
-                "value_date": sale_date + timedelta(days=int(customer_terms_days)),
+                "value_date": sale_date + terms,
                 "info": "",
             }
         )
