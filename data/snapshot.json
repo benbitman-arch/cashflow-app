@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "saved_at": "2026-05-18T08:11:27Z",
+  "saved_at": "2026-05-18T08:24:12Z",
   "payments_out_by_source": {
     "checks": [
       {
@@ -19,118 +19,6 @@
       },
       {
         "source": "checks",
-        "party": "M.SURESH COMPANY PVT.LTD",
-        "amount_usd": 7474.5,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "M.SURESH COMPANY PVT.LTD",
-        "amount_usd": 15930.0,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 81213.92,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 26074.13,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 37923.04,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 14555.0,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 20222.46,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 1644.75,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "GNYAN IMPEX",
-        "amount_usd": 54423.56,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 4990.67,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 32791.8,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 17871.51,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 5633.85,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 7777.02,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 4872.87,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "VENUS JEWEL",
-        "amount_usd": 15857.9,
-        "due_date": "2026-05-20",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "יהלומי  אלרון  בע\"מ",
         "amount_usd": 13125.0,
         "due_date": "2026-05-21",
@@ -142,13 +30,6 @@
         "amount_usd": 4654.5,
         "due_date": "2026-05-21",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "אקס ספרקס בע\"מ",
-        "amount_usd": 143.0,
-        "due_date": "2026-05-22",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -219,13 +100,6 @@
         "amount_usd": 8910.0,
         "due_date": "2026-05-25",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "KGK DIAMOND DMCC",
-        "amount_usd": 28460.05,
-        "due_date": "2026-05-25",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -303,55 +177,6 @@
         "amount_usd": 47418.25,
         "due_date": "2026-05-28",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 4361.82,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 14257.92,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "STAR RAYS",
-        "amount_usd": 11437.5,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "STAR RAYS",
-        "amount_usd": 7820.0,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "PALADIYA BROTHERS",
-        "amount_usd": 35090.18,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 79110.96,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 3800.5,
-        "due_date": "2026-05-28",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -474,80 +299,10 @@
       },
       {
         "source": "checks",
-        "party": "VENUS JEWEL",
-        "amount_usd": 4172.5,
-        "due_date": "2026-06-01",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "VENUS JEWEL",
-        "amount_usd": 2480.95,
-        "due_date": "2026-06-01",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "VENUS JEWEL",
-        "amount_usd": 32688.22,
-        "due_date": "2026-06-01",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "VENUS JEWEL",
-        "amount_usd": 6803.89,
-        "due_date": "2026-06-01",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "EMINENT GEMS LTD",
         "amount_usd": 150078.61,
         "due_date": "2026-06-01",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "GNYAN IMPEX",
-        "amount_usd": 38430.6,
-        "due_date": "2026-06-02",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "M/S SHARDA GEMS",
-        "amount_usd": 54873.68,
-        "due_date": "2026-06-02",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 8225.6,
-        "due_date": "2026-06-02",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 7139.78,
-        "due_date": "2026-06-02",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "SUN DIAM",
-        "amount_usd": 69293.18,
-        "due_date": "2026-06-03",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "DHARM DIAM BV",
-        "amount_usd": 72287.51,
-        "due_date": "2026-06-03",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -642,41 +397,6 @@
       },
       {
         "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 19561.01,
-        "due_date": "2026-06-09",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 7657.65,
-        "due_date": "2026-06-09",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 70558.52,
-        "due_date": "2026-06-09",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 136289.38,
-        "due_date": "2026-06-09",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "OFER MIZRAHI DIAMOND PVT LTD",
-        "amount_usd": 1349.95,
-        "due_date": "2026-06-09",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "ב.נמדר יהלומים בע\"מ",
         "amount_usd": 2240.0,
         "due_date": "2026-06-09",
@@ -691,45 +411,10 @@
       },
       {
         "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 1575.29,
-        "due_date": "2026-06-10",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 13512.52,
-        "due_date": "2026-06-10",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 4199.67,
-        "due_date": "2026-06-10",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "HARI KRISHNA EXPORTS PVT.LTD",
-        "amount_usd": 4856.64,
-        "due_date": "2026-06-10",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "זבולוני דניאל",
         "amount_usd": 8484.0,
         "due_date": "2026-06-12",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "לוי יצחק יהלומים",
-        "amount_usd": 19823.88,
-        "due_date": "2026-06-12",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -779,27 +464,6 @@
         "amount_usd": 13408.63,
         "due_date": "2026-06-14",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "KGK DIAMOND DMCC",
-        "amount_usd": 2165.8,
-        "due_date": "2026-06-15",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "KGK DIAMOND DMCC",
-        "amount_usd": 45383.81,
-        "due_date": "2026-06-15",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
-        "party": "ב.נמדר יהלומים בע\"מ",
-        "amount_usd": 2213.28,
-        "due_date": "2026-06-16",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -891,13 +555,6 @@
         "amount_usd": 8390.74,
         "due_date": "2026-06-22",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "Y.L.D DIAMONDS LTD",
-        "amount_usd": 7525.0,
-        "due_date": "2026-06-22",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -1076,13 +733,6 @@
       },
       {
         "source": "checks",
-        "party": "בבייב יעקב",
-        "amount_usd": 21420.0,
-        "due_date": "2026-06-28",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "שגיא קורן בע\"מ",
         "amount_usd": 40521.6,
         "due_date": "2026-06-28",
@@ -1090,24 +740,10 @@
       },
       {
         "source": "checks",
-        "party": "KGK DIAMOND DMCC",
-        "amount_usd": 49877.2,
-        "due_date": "2026-06-29",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "מושל יהלומים בע\"מ",
         "amount_usd": 24726.0,
         "due_date": "2026-06-30",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "ב.נמדר יהלומים בע\"מ",
-        "amount_usd": 4132.8,
-        "due_date": "2026-07-03",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -1188,13 +824,6 @@
       },
       {
         "source": "checks",
-        "party": "KGK DIAMOND DMCC",
-        "amount_usd": 48480.82,
-        "due_date": "2026-07-04",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "אס.אי.אם דיאמונדס בע\"ם",
         "amount_usd": 17843.04,
         "due_date": "2026-07-05",
@@ -1206,13 +835,6 @@
         "amount_usd": 6655.5,
         "due_date": "2026-07-05",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "ב.נמדר יהלומים בע\"מ",
-        "amount_usd": 4324.8,
-        "due_date": "2026-07-07",
-        "info": "ISRAEL DISCOUNT BANK"
       },
       {
         "source": "checks",
@@ -1335,13 +957,6 @@
       },
       {
         "source": "checks",
-        "party": "ב.נמדר יהלומים בע\"מ",
-        "amount_usd": 2026.92,
-        "due_date": "2026-07-18",
-        "info": "ISRAEL DISCOUNT BANK"
-      },
-      {
-        "source": "checks",
         "party": "נמדר יעקב",
         "amount_usd": 2851.2,
         "due_date": "2026-07-18",
@@ -1402,13 +1017,6 @@
         "amount_usd": 23138.0,
         "due_date": "2026-07-26",
         "info": "מזרחי טפחות"
-      },
-      {
-        "source": "checks",
-        "party": "אקס ספרקס בע\"מ",
-        "amount_usd": 3081.76,
-        "due_date": "2026-07-27",
-        "info": "ISRAEL DISCOUNT BANK"
       }
     ],
     "suppliers_debt": [
