@@ -778,11 +778,13 @@ real_in = real_in_ontime + real_in_overdue
 # Includes real OMD (on-time + overdue clamped to today), projected weekly
 # sales, FM Trading deposits, and payment-plan installments — anything we
 # expect to land in the bank within `end_date`.
-projected_in = (
-    float(inflows.loc[inflows["value_date"] <= end_date, "amount_usd"].sum())
-    if not inflows.empty
-    else 0.0
-)
+if not inflows.empty:
+    _in_window = inflows[inflows["value_date"] <= end_date]
+    projected_in = float(_in_window["amount_usd"].sum())
+    _by_source = _in_window.groupby("source")["amount_usd"].sum().to_dict()
+else:
+    projected_in = 0.0
+    _by_source = {}
 total_out = float(outflows["amount_usd"].sum()) if not outflows.empty else 0.0
 # Split total debts: real obligations (checks + supplier debt) vs synthetic
 # recurring weekly expenses (salaries, office). Show full total + breakdown.
@@ -864,11 +866,31 @@ _card(
     _short_money(real_in),
     sub=(f"↑ incl. {_short_money(real_in_overdue)} overdue" if real_in_overdue > 0 else ""),
 )
-_card(
-    c5,
-    "Projected receivables",
-    _short_money(projected_in),
-    sub=f"all income arriving in {horizon}d",
+# Projected receivables — rendered as a custom card with per-source breakdown.
+_source_labels = {
+    "omd_debt": "Customer invoices",
+    "payment_plan": "Payment plans",
+    "projected_sales": "Projected sales",
+    "fm_trading": "FM Trading",
+}
+_breakdown_rows = []
+for _src_key, _src_label in _source_labels.items():
+    _amt = _by_source.get(_src_key, 0)
+    if _amt > 0:
+        _breakdown_rows.append(
+            f"<div style='display:flex;justify-content:space-between;gap:6px'>"
+            f"<span style='color:#666'>{_src_label}</span>"
+            f"<span style='color:#0d652d;font-weight:500'>{_short_money(_amt)}</span>"
+            f"</div>"
+        )
+_breakdown_html = "".join(_breakdown_rows) if _breakdown_rows else ""
+
+c5.markdown(
+    f"<div style='font-size:13px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>Projected receivables</div>"
+    f"<div style='font-size:clamp(18px, 2.2vw, 28px);font-weight:600;color:#1a1a1a;line-height:1.25;white-space:nowrap;overflow:hidden'>{_short_money(projected_in)}</div>"
+    f"<div style='font-size:11px;color:#888;margin-top:4px;margin-bottom:2px'>all income arriving in {horizon}d:</div>"
+    f"<div style='font-size:11px;line-height:1.45'>{_breakdown_html}</div>",
+    unsafe_allow_html=True,
 )
 _card(
     c6,
