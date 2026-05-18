@@ -96,11 +96,31 @@ def parse_checks(file) -> ParseResult:
     except ValueError:
         pass
 
+    # Only count checks drawn on Mizrahi Tefahot (our Israeli account that
+    # auto-deducts checks). Other banks (Israel Discount Bank etc.) are
+    # paid through different channels and shouldn't affect this projection.
+    allowed_bank_norm = _norm("מזרחי טפחות")
+
     today = date.today()
     out, dropped, warns = [], [], []
     for _, r in df.iterrows():
         amt = r[amount_col]
         if pd.isna(amt) or float(amt) <= 0:
+            continue
+        bank_val = (
+            str(r[bank_col_name]).strip()
+            if bank_col_name and not pd.isna(r[bank_col_name])
+            else ""
+        )
+        if bank_col_name and _norm(bank_val) != allowed_bank_norm:
+            dropped.append(
+                {
+                    "reason": "wrong bank (not Mizrahi Tefahot)",
+                    "name": str(r[name_col]).strip(),
+                    "amount": float(amt),
+                    "bank": bank_val,
+                }
+            )
             continue
         d = _to_date(r[date_col])
         if d is None:
@@ -122,7 +142,7 @@ def parse_checks(file) -> ParseResult:
                 "party": str(r[name_col]).strip(),
                 "amount_usd": float(amt),
                 "due_date": d,
-                "info": str(r[bank_col_name]).strip() if bank_col_name else "",
+                "info": bank_val,
             }
         )
     return ParseResult(pd.DataFrame(out), pd.DataFrame(dropped), warns)
